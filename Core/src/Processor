@@ -102,20 +102,23 @@ module Processor (
   BRANCH_IF_A_EQUAL_B = 8'h33,  //
   BRANCH_IF_A_LESS_THAN_B = 8'h34,  // 
   BRANCH_IF_A_GREATER_THAN_B = 8'h35,  //
-  BRANCH_IF_0 = 8'h36,
-  BRANCH_IF_1 = 8'h37,
-  BRANCH_IF_2 = 8'h38; //wait for new op address to settle. end op.
-   //
+  BRANCH_IF_0 = 8'h36,  //
+  BRANCH_IF_1 = 8'h37,  //wait for new op address to settle. end op.
   //GoTo
-//   GOTO_ADDR = 8'h36,  //
-//   GOTO_IDLE = 8'h37,  //
-//   //Function Start
-//   FUNC_CALL_ADDR = 8'h38,  //
-//   //Return from Func
-//   RETURN_FROM_FUNC = 8'h39,  //
-//   //Dereference
-//   READ_ADDR_IN_A_SET_TO_A = 8'h40,  //
-  READ_ADDR_IN_B_SET_TO_B = 8'h41;
+  GOTO_ADDR = 8'h38,  //
+  GOTO_ADDR_0 = 8'h39,  //
+  GOTO_ADDR_1 = 8'h40,  //
+  GOTO_IDLE = 8'h42,  //
+  GOTO_IDLE_0 = 8'h43,  //
+  //Function Start
+  FUNC_CALL_ADDR = 8'h44,  //
+  FUNC_CALL_ADDR_0 = 8'h45,  //
+  FUNC_CALL_ADDR_1 = 8'h46;  //
+  //Return from Func
+  //   RETURN_FROM_FUNC = 8'h39,  //
+  //   //Dereference
+  //   READ_ADDR_IN_A_SET_TO_A = 8'h40,  //
+  //   READ_ADDR_IN_B_SET_TO_B = 8'h41;
 
   //Sequential part of the State Machine.
   reg [7:0] CurrState, NextState;
@@ -207,11 +210,10 @@ module Processor (
           4'h8: NextState = BRANCH_IF_A_GREATER_THAN_B;
           4'h9: NextState = GOTO_ADDR;
           4'hA: NextState = GOTO_IDLE;
-          4'hB: NextState = IDLE;
-          4'hC: NextState = FUNC_CALL_ADDR;
-          4'hD: NextState = RETURN_FROM_FUNC;
-          4'hE: NextState = READ_ADDR_IN_A_SET_TO_A;
-          4'hF: NextState = READ_ADDR_IN_A_SET_TO_B;
+          4'hB: NextState = FUNC_CALL_ADDR;
+          4'hC: NextState = RETURN_FROM_FUNC;
+          4'hD: NextState = READ_ADDR_IN_A_SET_TO_A;
+          4'hE: NextState = READ_ADDR_IN_A_SET_TO_B;
           default: NextState = CurrState;
         endcase
         NextProgCounterOffset = 2'h1;
@@ -294,31 +296,120 @@ module Processor (
       end
       //Wait state for new prog address to settle.
       DO_MATHS_OPP_0: NextState = CHOOSE_OPP;
+
       ///////////////////////////////////////////////////////////////////////////////////////
-      //BRANCH_IF_EQUAL:
+      //BRANCH_IF_EQUAL: Branch pipeline:
+      // - Check ALU output for relevant condition. 
+      //    - If passed, proceed to BRANCH_IF_0: Sets Program Counter to 2nd byte ROM output.
+      //    - If failed, proceed to BRANCH_IF_1: Sets Program Counter +2, skipping 2nd byte.
+      // - Always pass through BRANCH_IF_1, to wait ROM output to settle before reading the
+      //   next instruction.
+
+      // Check for branch if equal
       BRANCH_IF_A_EQUAL_B: begin
-        if(NextRegA == NextRegB) 
-            NextState = BRANCH_IF_0;
-        else
-            NextState = BRANCH_IF_1;
+        if (ALuOut) NextState = BRANCH_IF_0;
+        else begin
+          NextProgCounter = NextProgCounter + 2;
+          NextState = BRANCH_IF_1;
+        end
       end
-      
+
+      // Check for branch if less than
+      BRANCH_IF_A_LESS_THAN_B: begin
+        if (ALuOut) NextState = BRANCH_IF_0;
+        else begin
+          NextProgCounter = NextProgCounter + 2;
+          NextState = BRANCH_IF_1;
+        end
+      end
+
+      // Check for branch if greater than
+      BRANCH_IF_A_GREATER_THAN_B: begin
+        if (ALuOut) NextState = BRANCH_IF_0;
+        else begin
+          NextProgCounter = NextProgCounter + 2;
+          NextState = BRANCH_IF_1;
+        end
+      end
+
+      // Assign second byte to PC if the condition passed.
       BRANCH_IF_0: begin
         NextState = BRANCH_IF_1;
-        NextBusAddr = ProgMemoryOut;
+        NextProgCounter = ProgMemoryOut;
       end
 
+      // Wait for new PC to settle.
       BRANCH_IF_1: begin
-        NextState = BRANCH_IF_2;
-        NextProgCounter = CurrProgCounter + 1;
-      end
-
-      BRANCH_IF_2: begin
         NextState = CHOOSE_OPP;
       end
-      //  ………………..
-      // FILL IN THIS AREA
-      // ……………….
+
+      ///////////////////////////////////////////////////////////////////////////////////////
+      //GOTO ADDRESS: Unconditional jump pipeline:
+      // - Wait for ROM output to stabilize. 
+      // - Assign ROM output to PC.
+      // - Wait for ROM output to stabilize.
+
+      // Wait for ROM to settle
+      GOTO_ADDR: begin
+        NextState = GOTO_ADDR_0;
+      end
+
+      // Read next address into prog counter
+      GOTO_ADDR_0: begin
+        NextProgCounter = ProgMemoryOut;
+        NextState = GOTO_ADDR_1;
+      end
+
+      // Wait for ROM to settle again.
+      GOTO_ADDR_1: begin
+        NextState = CHOOSE_OPP;
+      end
+
+      ///////////////////////////////////////////////////////////////////////////////////////
+      //GOTO IDLE: RESET to IDLE state:
+      // - Increment Program counter? Or should it be reset?. 
+      // - Wait for ROM to settle, and go to IDLE state.
+
+      // Wait for ROM to settle
+      GOTO_IDLE: begin
+        NextProgCounter = NextProgCounter + 1;  //? Should the counter be reset here?
+        NextState = GOTO_IDLE_0;
+      end
+
+      // Wait for ROM to settle again.
+      GOTO_IDLE_0: begin
+        NextState = IDLE;
+      end
+
+      ///////////////////////////////////////////////////////////////////////////////////////
+      //GOTO IDLE: RESET to IDLE state:
+      // - Increment Program counter? Or should it be reset?. 
+      // - Wait for ROM to settle, and go to IDLE state.
+
+      // Wait for ROM to settle
+      GOTO_IDLE: begin
+        NextProgCounter = NextProgCounter + 1;  //? Should the counter be reset here?
+        NextState = GOTO_IDLE_0;
+      end
+
+      // Wait for ROM to settle again.
+      GOTO_IDLE_0: begin
+        NextState = IDLE;
+      end
+
+      ///////////////////////////////////////////////////////////////////////////////////////
+      //GOTO IDLE: RESET to IDLE state:
+      // - Increment Program counter? Or should it be reset?. 
+      // - Wait for ROM to settle, and go to IDLE state.
+
+      FUNC_CALL_ADDR: begin
+        NextState = FUNC_CALL_ADDR_0;
+      end
+
+      FUNC_CALL_ADDR_0: begin
+        NextBusAddr = ProgMemOut;
+        NextState   = FUNC_CALL_ADDR_1;
+      end
     endcase
   end
 endmodule
