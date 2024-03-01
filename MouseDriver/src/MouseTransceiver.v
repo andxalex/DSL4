@@ -42,7 +42,8 @@ module MouseTransceiver (
     output EXPLORER,
     output [1:0] SENSITIVITY,
     output [4:0] ACCUM_X,
-    output [4:0] ACCUM_Y
+    output [4:0] ACCUM_Y,
+    output SEND_INTERRUPT
 );
 
   // X, Y Limits of Mouse Position e.g. VGA Screen with 160 x 120 resolution
@@ -268,5 +269,7 @@ module MouseTransceiver (
       else MouseZ <= MouseNewZ[2:0];
     end
   end
+
+  assign SEND_INTERRUPT = SendInterrupt;
 endmodule
 

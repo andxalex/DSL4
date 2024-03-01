@@ -2,17 +2,17 @@
 
 module Processor (
     //Standard Signals
-    input CLK,
-    input RESET,
+    input        CLK,
+    input        RESET,
     //BUS Signals
-    inout [7:0] BUS_DATA,
+    inout  [7:0] BUS_DATA,
     output [7:0] BUS_ADDR,
-    output BUS_WE,
+    output       BUS_WE,
     // ROM signals
     output [7:0] ROM_ADDRESS,
-    input [7:0] ROM_DATA,
+    input  [7:0] ROM_DATA,
     // INTERRUPT signals
-    input [1:0] BUS_INTERRUPTS_RAISE,
+    input  [1:0] BUS_INTERRUPTS_RAISE,
     output [1:0] BUS_INTERRUPTS_ACK
 );
   //The main data bus is treated as tristate, so we need a mechanism to handle this.
