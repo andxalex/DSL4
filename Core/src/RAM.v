@@ -17,6 +17,8 @@ module RAM (
 
   //Only place data on the bus if the processor is NOT writing, and it is addressing this memory
   assign BUS_DATA = (RAMBusWE) ? Out : 8'hZZ;
+
+  //Buffer 
   assign BufferedBusData = BUS_DATA;
 
   //Memory
