@@ -31,7 +31,7 @@ module ALU (
         4'h6: Out <= IN_B + 1'b1;
         //Decrement A-1
         4'h7: Out <= IN_A - 1'b1;
-        //Decrement B+1
+        //Decrement B-1
         4'h8: Out <= IN_B - 1'b1;
         // In/Equality Operations
         //A == B
