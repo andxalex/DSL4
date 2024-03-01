@@ -92,9 +92,12 @@ module MouseDriverIO (
 
   //single port ROM (from the view of the processor)
   always @(posedge CLK) begin
-    if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < BaseAddr + 5) & (~BUS_WE)) DataBusOutWE <= 1'b1;
+    if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < BaseAddr + 6) & (~BUS_WE)) DataBusOutWE <= 1'b1;
     else DataBusOutWE <= 1'b0;
 
     DataBusOut <= regBank[BUS_ADDR-BaseAddr];
   end
+
+  // TODO: Some memory needs to be writable to control sensitivity and such through software:
+  // Specifically: INC_SENS and RED_SENS
 endmodule
