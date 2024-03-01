@@ -97,14 +97,20 @@ module Processor (
   //Data Manipulation
   DO_MATHS_OPP_SAVE_IN_A = 8'h30,  //The result of maths op. is available, save it to Reg A.
   DO_MATHS_OPP_SAVE_IN_B = 8'h31,  //The result of maths op. is available, save it to Reg B.
-  DO_MATHS_OPP_0 = 8'h32;  //wait for new op address to settle. end op.
-  /*
-Complete the above parameter list for In/Equality, Goto Address, Goto Idle, function start, Return from
-function, and Dereference operations.
-*/
-  //  ………………..
-  // FILL IN THIS AREA
-  // ……………….
+  DO_MATHS_OPP_0 = 8'h32,  //wait for new op address to settle. end op.
+  //In/Equality
+  BRANCH_IF_A_EQUAL_B = 8'h33, BRANCH_IF_A_LESS_THAN_B = 8'h34, BRANCH_IF_A_GREATER_THAN_B = 8'h35,
+
+  //GoTo
+  GOTO_ADDR = 8'h36, GOTO_IDLE = 8'h37,
+
+  //Function Start
+
+  //Return from Func
+
+  //Dereference
+  CHANGE_THIS = 8'hFF;
+
   //Sequential part of the State Machine.
   reg [7:0] CurrState, NextState;
   always @(posedge CLK) begin
