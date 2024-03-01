@@ -99,17 +99,23 @@ module Processor (
   DO_MATHS_OPP_SAVE_IN_B = 8'h31,  //The result of maths op. is available, save it to Reg B.
   DO_MATHS_OPP_0 = 8'h32,  //wait for new op address to settle. end op.
   //In/Equality
-  BRANCH_IF_A_EQUAL_B = 8'h33, BRANCH_IF_A_LESS_THAN_B = 8'h34, BRANCH_IF_A_GREATER_THAN_B = 8'h35,
-
+  BRANCH_IF_A_EQUAL_B = 8'h33,  //
+  BRANCH_IF_A_LESS_THAN_B = 8'h34,  // 
+  BRANCH_IF_A_GREATER_THAN_B = 8'h35,  //
+  BRANCH_IF_0 = 8'h36,
+  BRANCH_IF_1 = 8'h37,
+  BRANCH_IF_2 = 8'h38; //wait for new op address to settle. end op.
+   //
   //GoTo
-  GOTO_ADDR = 8'h36, GOTO_IDLE = 8'h37,
-
-  //Function Start
-
-  //Return from Func
-
-  //Dereference
-  CHANGE_THIS = 8'hFF;
+//   GOTO_ADDR = 8'h36,  //
+//   GOTO_IDLE = 8'h37,  //
+//   //Function Start
+//   FUNC_CALL_ADDR = 8'h38,  //
+//   //Return from Func
+//   RETURN_FROM_FUNC = 8'h39,  //
+//   //Dereference
+//   READ_ADDR_IN_A_SET_TO_A = 8'h40,  //
+  READ_ADDR_IN_B_SET_TO_B = 8'h41;
 
   //Sequential part of the State Machine.
   reg [7:0] CurrState, NextState;
@@ -183,7 +189,9 @@ module Processor (
         NextProgCounter = ProgMemoryOut;
       end
       //Wait for the new program counter value to settle
-      GET_THREAD_START_ADDR_2: NextState = CHOOSE_OPP;
+      GET_THREAD_START_ADDR_2: begin
+        NextState = CHOOSE_OPP;
+      end
       ///////////////////////////////////////////////////////////////////////////////////////
       //CHOOSE_OPP - Another case statement to choose which operation to perform
       CHOOSE_OPP: begin
@@ -194,13 +202,16 @@ module Processor (
           4'h3: NextState = WRITE_TO_MEM_FROM_B;
           4'h4: NextState = DO_MATHS_OPP_SAVE_IN_A;
           4'h5: NextState = DO_MATHS_OPP_SAVE_IN_B;
-          4'h6: NextState = IF_A_EQUALITY_B_GOTO;
-          4'h7: NextState = GOTO;
-          4'h8: NextState = IDLE;
-          4'h9: NextState = FUNCTION_START;
-          4'hA: NextState = RETURN;
-          4'hB: NextState = DE_REFERENCE_A;
-          4'hC: NextState = DE_REFERENCE_B;
+          4'h6: NextState = BRANCH_IF_A_EQUAL_B;
+          4'h7: NextState = BRANCH_IF_A_LESS_THAN_B;
+          4'h8: NextState = BRANCH_IF_A_GREATER_THAN_B;
+          4'h9: NextState = GOTO_ADDR;
+          4'hA: NextState = GOTO_IDLE;
+          4'hB: NextState = IDLE;
+          4'hC: NextState = FUNC_CALL_ADDR;
+          4'hD: NextState = RETURN_FROM_FUNC;
+          4'hE: NextState = READ_ADDR_IN_A_SET_TO_A;
+          4'hF: NextState = READ_ADDR_IN_A_SET_TO_B;
           default: NextState = CurrState;
         endcase
         NextProgCounterOffset = 2'h1;
@@ -210,13 +221,13 @@ module Processor (
       //Wait state - to give time for the mem address to be read. Reg select is set to 0
       READ_FROM_MEM_TO_A: begin
         NextState = READ_FROM_MEM_0;
-        NextRegSelect = 1'b0;
+        NextRegSelect = 1'b0;  //Select register A
       end
       //READ_FROM_MEM_TO_B : here starts the memory read operational pipeline.
       //Wait state - to give time for the mem address to be read. Reg select is set to 1
       READ_FROM_MEM_TO_B: begin
         NextState = READ_FROM_MEM_0;
-        NextRegSelect = 1'b1;
+        NextRegSelect = 1'b1;  //Select register B
       end
       //The address will be valid during this state, so set the BUS_ADDR to this value.
       READ_FROM_MEM_0: begin
@@ -283,10 +294,28 @@ module Processor (
       end
       //Wait state for new prog address to settle.
       DO_MATHS_OPP_0: NextState = CHOOSE_OPP;
-      /*
-Complete the above case statement for In/Equality, Goto Address, Goto Idle, function start, Return from
-function, and Dereference operations.
-*/
+      ///////////////////////////////////////////////////////////////////////////////////////
+      //BRANCH_IF_EQUAL:
+      BRANCH_IF_A_EQUAL_B: begin
+        if(NextRegA == NextRegB) 
+            NextState = BRANCH_IF_0;
+        else
+            NextState = BRANCH_IF_1;
+      end
+      
+      BRANCH_IF_0: begin
+        NextState = BRANCH_IF_1;
+        NextBusAddr = ProgMemoryOut;
+      end
+
+      BRANCH_IF_1: begin
+        NextState = BRANCH_IF_2;
+        NextProgCounter = CurrProgCounter + 1;
+      end
+
+      BRANCH_IF_2: begin
+        NextState = CHOOSE_OPP;
+      end
       //  ………………..
       // FILL IN THIS AREA
       // ……………….
