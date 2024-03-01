@@ -113,12 +113,15 @@ module Processor (
   //Function Start
   FUNC_CALL_ADDR = 8'h44,  //
   FUNC_CALL_ADDR_0 = 8'h45,  //
-  FUNC_CALL_ADDR_1 = 8'h46;  //
+  FUNC_CALL_ADDR_1 = 8'h46,  //
   //Return from Func
-  //   RETURN_FROM_FUNC = 8'h39,  //
-  //   //Dereference
-  //   READ_ADDR_IN_A_SET_TO_A = 8'h40,  //
-  //   READ_ADDR_IN_B_SET_TO_B = 8'h41;
+  RETURN_FROM_FUNC = 8'h47,  //
+  RETURN_FROM_FUNC_0 = 8'h48,  //
+  //Dereference
+  READ_ADDR_IN_A_SET_TO_A = 8'h49,  //
+  READ_ADDR_IN_B_SET_TO_B = 8'h50,  // 
+  READ_ADDR_IN_A_SET_TO_0 = 8'h51,  // 
+  READ_ADDR_IN_A_SET_TO_1 = 8'h52;  //
 
   //Sequential part of the State Machine.
   reg [7:0] CurrState, NextState;
@@ -382,34 +385,76 @@ module Processor (
       end
 
       ///////////////////////////////////////////////////////////////////////////////////////
-      //GOTO IDLE: RESET to IDLE state:
-      // - Increment Program counter? Or should it be reset?. 
-      // - Wait for ROM to settle, and go to IDLE state.
+      //FUNC CALL ADDR: JUMP and LINK pipeline:
+      // - Save program context and wait for ROM to stabilize. 
+      // - Write ROM into PC.
+      // - Wait for ROM to stabilize before going to next instruction.
 
-      // Wait for ROM to settle
-      GOTO_IDLE: begin
-        NextProgCounter = NextProgCounter + 1;  //? Should the counter be reset here?
-        NextState = GOTO_IDLE_0;
+      // Save program context, wait for ROM to stabilize
+      FUNC_CALL_ADDR: begin
+        NextState = FUNC_CALL_ADDR_0;
+        NextProgContext = NextProgCounter + 2;
       end
 
-      // Wait for ROM to settle again.
-      GOTO_IDLE_0: begin
-        NextState = IDLE;
+      //  Write ROM into PC
+      FUNC_CALL_ADDR_0: begin
+        NextProgCounter = ProgMemOut;
+        NextState = FUNC_CALL_ADDR_1;
+      end
+
+      // Wait for ROM to stabilize.
+      FUNC_CALL_ADDR_1: begin
+        NextState = CHOOSE_OPP;
       end
 
       ///////////////////////////////////////////////////////////////////////////////////////
-      //GOTO IDLE: RESET to IDLE state:
-      // - Increment Program counter? Or should it be reset?. 
-      // - Wait for ROM to settle, and go to IDLE state.
+      //RETURN: Branch to previous contxt pipeline:
+      // - Write previous context into PC. 
+      // - Wait for ROM to stabilize before going to next instruction.
 
-      FUNC_CALL_ADDR: begin
-        NextState = FUNC_CALL_ADDR_0;
+      // Write previous context into PC
+      RETURN_FROM_FUNC: begin
+        NextState = RETURN_FROM_FUNC_0;
+        NextProgCounter = NextProgContext;
       end
 
-      FUNC_CALL_ADDR_0: begin
-        NextBusAddr = ProgMemOut;
-        NextState   = FUNC_CALL_ADDR_1;
+      // Wait for ROM to stabilize
+      RETURN_FROM_FUNC_0: begin
+        NextState = CHOOSE_OPP;
       end
+
+      ///////////////////////////////////////////////////////////////////////////////////////
+      //READ_ADDR_IN_X_SET_TO_X: Dereference Pipeline:
+      // - Set RegSelect flag and write the register value on the address bus. 
+      // - Wait for bus to stabilize, and set next PC.
+      // - Set register value, wait for ROM to stabilize.
+
+      // Set RegSelect flag and write register value on the address bus.
+      READ_ADDR_IN_A_SET_TO_A: begin
+        NextState = READ_ADDR_IN_A_SET_TO_0;
+        NextRegSelect = 1'b0;
+        NextBusAddr = NextRegA;
+      end
+
+      READ_ADDR_IN_A_SET_TO_B: begin
+        NextState = READ_ADDR_IN_A_SET_TO_0;
+        NextRegSelect = 1'b1;
+        NextBusAddr = NextRegB;
+      end
+
+      // Set register value, wait for ROM to stabilize.
+      READ_ADDR_IN_A_SET_TO_0: begin
+        NextState = READ_ADDR_IN_A_SET_TO_1;
+        NextProgCounter = NextProgCounter + 1;
+      end
+
+      // Wait for bus to stabilize, and set next PC
+      READ_ADDR_IN_A_SET_TO_1: begin
+        NextState = CHOOSE_OPP;
+        if (!CurrRegSelect) NextRegA = BusDataIn;
+        else NextRegB = BusDataIn;
+      end
+
     endcase
   end
 endmodule
