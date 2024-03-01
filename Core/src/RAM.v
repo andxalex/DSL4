@@ -34,13 +34,9 @@ module RAM (
       if (BUS_WE) begin
         Mem[BUS_ADDR[6:0]] <= BufferedBusData;
         RAMBusWE <= 1'b0;
-      end 
-      else 
-        RAMBusWE <= 1'b1;
-    end 
-    else 
-      RAMBusWE <= 1'b0;
-      
+      end else RAMBusWE <= 1'b1;
+    end else RAMBusWE <= 1'b0;
+
     Out <= Mem[BUS_ADDR[6:0]];
   end
 
