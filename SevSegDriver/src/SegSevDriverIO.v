@@ -70,4 +70,7 @@ module SegSevDriverIO (
 
     DataBusOut <= regBank[BUS_ADDR-BaseAddr];
   end
+
+  assign SEG_SELECT = seg_select;
+  assign DEC_OUT = dec_out;
 endmodule
