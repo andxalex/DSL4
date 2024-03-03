@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module MouseSystemWrapper (
+module SegSevDriverIO (
     input        CLK,
     input        RESET,
     //BUS
