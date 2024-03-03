@@ -4,8 +4,8 @@ module ROM (
     //standard signals
     input            CLK,
     //BUS signals
-    output reg [7:0] DATA,
-    input      [7:0] ADDR
+    output reg [7:0] BUS_DATA,
+    input      [7:0] BUS_ADDR
 );
 
   parameter RAMAddrWidth = 8;
@@ -17,6 +17,6 @@ module ROM (
   initial $readmemh("Complete_Demo_ROM.txt", ROM);
 
   //single port ram
-  always @(posedge CLK) DATA <= ROM[ADDR];
+  always @(posedge CLK) BUS_DATA <= ROM[BUS_ADDR];
 
 endmodule

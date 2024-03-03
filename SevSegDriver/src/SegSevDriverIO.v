@@ -21,10 +21,10 @@ module SegSevDriverIO (
 
   //Instantiate 7 seg display
   Seg7Display S7 (
-      .IN_A(regBank[0]),
-      .IN_B(regBank[1]),
-      .IN_C(regBank[2]),
-      .IN_D(regBank[3]),
+      .IN_A(regBank[0][4:0]),
+      .IN_B(regBank[1][4:0]),
+      .IN_C(regBank[2][4:0]),
+      .IN_D(regBank[3][4:0]),
       .CLK(CLK),
       .SEG_SELECT(seg_select),
       .DEC_OUT(dec_out)
@@ -70,4 +70,7 @@ module SegSevDriverIO (
 
     DataBusOut <= regBank[BUS_ADDR-BaseAddr];
   end
+
+  assign SEG_SELECT = seg_select;
+  assign DEC_OUT = dec_out;
 endmodule

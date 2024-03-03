@@ -8,8 +8,8 @@ module System (
     // input BTN_L,
     // input BTN_R,
     // MOUSE
-    inout CLK_MOUSE,
-    inout DATA_MOUSE,
+    // inout CLK_MOUSE,
+    // inout DATA_MOUSE,
     // OUT
     // output [15:0] LED_OUT,
     output [3:0] SEG_SELECT,
@@ -47,9 +47,8 @@ module System (
 
   ROM theres_no_fancy_rom_stick (
       .CLK(CLK),
-      .BUS_DATA(bus_data),
-      .BUS_ADDR(bus_addr),
-      .BUS_WE(bus_we)
+      .BUS_DATA(rom_data),
+      .BUS_ADDR(rom_addr)
   );
 
   Timer same_as_above (
@@ -62,14 +61,14 @@ module System (
       .BUS_INTERRUPT_ACK(bus_interrupts_ack[0])
   );
 
-  SegSevDriverIO Samsung_odyssey_neo_g9 (
-      .CLK(CLK),
-      .RESET(RESET),
-      .BUS_DATA(bus_data),
-      .BUS_ADDR(bus_addr),
-      .BUS_WE(bus_we),
-      .SEG_SELECT(SEG_SELECT),
-      .DEC_OUT(DEC_OUT)
-  );
+  //   SegSevDriverIO Samsung_odyssey_neo_g9 (
+  //       .CLK(CLK),
+  //       .RESET(RESET),
+  //       .BUS_DATA(bus_data),
+  //       .BUS_ADDR(bus_addr),
+  //       .BUS_WE(bus_we),
+  //       .SEG_SELECT(SEG_SELECT),
+  //       .DEC_OUT(DEC_OUT)
+  //   );
 
 endmodule
