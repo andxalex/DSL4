@@ -74,12 +74,15 @@ module MouseDriverIO (
   reg [7:0] regBank[5:0];
 
   always @(posedge CLK) begin
-    regBank[0] <= {2'b00, status_mouse};
-    regBank[1] <= x_mouse;
-    regBank[2] <= y_mouse;
-    regBank[3] <= z_mouse;
-    regBank[4] <= {1'b0, intellimouse, explorer, x};
-    regBank[5] <= {1'b0, sensitivity, y};
+    if (RESET) for (i = 0; i < 6; i = i + 1) regBank[i] <= 8'h0;
+    else begin
+      regBank[0] <= {2'b00, status_mouse};
+      regBank[1] <= x_mouse;
+      regBank[2] <= y_mouse;
+      regBank[3] <= z_mouse;
+      regBank[4] <= {1'b0, intellimouse, explorer, x};
+      regBank[5] <= {1'b0, sensitivity, y};
+    end
   end
 
   // The above block is effectively an extension of Data memory. The Base address below 
@@ -91,7 +94,8 @@ module MouseDriverIO (
 
   //single port ROM (from the view of the processor)
   always @(posedge CLK) begin
-    if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < BaseAddr + 6) & (~BUS_WE)) DataBusOutWE <= 1'b1;
+    if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < BaseAddr + 6) & (~BUS_WE) & (~RESET))
+      DataBusOutWE <= 1'b1;
     else DataBusOutWE <= 1'b0;
 
     DataBusOut <= regBank[BUS_ADDR-BaseAddr];
