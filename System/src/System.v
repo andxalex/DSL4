@@ -34,7 +34,7 @@ module System (
       .BUS_WE(bus_we),
       .ROM_ADDRESS(rom_addr),
       .ROM_DATA(rom_data),
-      .BUS_INTERRUPT_RAISE(bus_interrupt_raise),
+      .BUS_INTERRUPTS_RAISE(bus_interrupt_raise),
       .BUS_INTERRUPTS_ACK(bus_interrupts_ack)
   );
 

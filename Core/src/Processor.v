@@ -398,7 +398,7 @@ module Processor (
 
       //  Write ROM into PC
       FUNC_CALL_ADDR_0: begin
-        NextProgCounter = ProgMemOut;
+        NextProgCounter = ProgMemoryOut;
         NextState = FUNC_CALL_ADDR_1;
       end
 
@@ -436,7 +436,7 @@ module Processor (
         NextBusAddr = NextRegA;
       end
 
-      READ_ADDR_IN_A_SET_TO_B: begin
+      READ_ADDR_IN_B_SET_TO_B: begin
         NextState = READ_ADDR_IN_A_SET_TO_0;
         NextRegSelect = 1'b1;
         NextBusAddr = NextRegB;
