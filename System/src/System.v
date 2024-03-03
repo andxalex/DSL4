@@ -8,8 +8,8 @@ module System (
     // input BTN_L,
     // input BTN_R,
     // MOUSE
-    inout CLK_MOUSE,
-    inout DATA_MOUSE,
+    // inout CLK_MOUSE,
+    // inout DATA_MOUSE,
     // OUT
     // output [15:0] LED_OUT,
     output [3:0] SEG_SELECT,
@@ -48,8 +48,7 @@ module System (
   ROM theres_no_fancy_rom_stick (
       .CLK(CLK),
       .BUS_DATA(bus_data),
-      .BUS_ADDR(bus_addr),
-      .BUS_WE(bus_we)
+      .BUS_ADDR(bus_addr)
   );
 
   Timer same_as_above (

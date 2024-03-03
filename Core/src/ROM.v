@@ -17,6 +17,6 @@ module ROM (
   initial $readmemh("Complete_Demo_ROM.txt", ROM);
 
   //single port ram
-  always @(posedge CLK) DATA <= ROM[ADDR];
+  always @(posedge CLK) BUS_DATA <= ROM[BUS_ADDR];
 
 endmodule
