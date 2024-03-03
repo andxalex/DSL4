@@ -61,14 +61,14 @@ module System (
       .BUS_INTERRUPT_ACK(bus_interrupts_ack[0])
   );
 
-  SegSevDriverIO Samsung_odyssey_neo_g9 (
-      .CLK(CLK),
-      .RESET(RESET),
-      .BUS_DATA(bus_data),
-      .BUS_ADDR(bus_addr),
-      .BUS_WE(bus_we),
-      .SEG_SELECT(SEG_SELECT),
-      .DEC_OUT(DEC_OUT)
-  );
+  //   SegSevDriverIO Samsung_odyssey_neo_g9 (
+  //       .CLK(CLK),
+  //       .RESET(RESET),
+  //       .BUS_DATA(bus_data),
+  //       .BUS_ADDR(bus_addr),
+  //       .BUS_WE(bus_we),
+  //       .SEG_SELECT(SEG_SELECT),
+  //       .DEC_OUT(DEC_OUT)
+  //   );
 
 endmodule
