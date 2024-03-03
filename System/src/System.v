@@ -47,8 +47,8 @@ module System (
 
   ROM theres_no_fancy_rom_stick (
       .CLK(CLK),
-      .BUS_DATA(bus_data),
-      .BUS_ADDR(bus_addr)
+      .BUS_DATA(rom_data),
+      .BUS_ADDR(rom_addr)
   );
 
   Timer same_as_above (
