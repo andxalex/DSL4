@@ -310,7 +310,7 @@ module Processor (
 
       // Check for branch if equal
       BRANCH_IF_A_EQUAL_B: begin
-        if (ALuOut) NextState = BRANCH_IF_0;
+        if (AluOut) NextState = BRANCH_IF_0;
         else begin
           NextProgCounter = NextProgCounter + 2;
           NextState = BRANCH_IF_1;
@@ -319,7 +319,7 @@ module Processor (
 
       // Check for branch if less than
       BRANCH_IF_A_LESS_THAN_B: begin
-        if (ALuOut) NextState = BRANCH_IF_0;
+        if (AluOut) NextState = BRANCH_IF_0;
         else begin
           NextProgCounter = NextProgCounter + 2;
           NextState = BRANCH_IF_1;
@@ -328,7 +328,7 @@ module Processor (
 
       // Check for branch if greater than
       BRANCH_IF_A_GREATER_THAN_B: begin
-        if (ALuOut) NextState = BRANCH_IF_0;
+        if (AluOut) NextState = BRANCH_IF_0;
         else begin
           NextProgCounter = NextProgCounter + 2;
           NextState = BRANCH_IF_1;
