@@ -216,7 +216,7 @@ module Processor (
           4'hB: NextState = FUNC_CALL_ADDR;
           4'hC: NextState = RETURN_FROM_FUNC;
           4'hD: NextState = READ_ADDR_IN_A_SET_TO_A;
-          4'hE: NextState = READ_ADDR_IN_A_SET_TO_B;
+          4'hE: NextState = READ_ADDR_IN_B_SET_TO_B;
           default: NextState = CurrState;
         endcase
         NextProgCounterOffset = 2'h1;
