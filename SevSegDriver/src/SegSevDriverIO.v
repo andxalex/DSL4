@@ -30,6 +30,11 @@ module SegSevDriverIO (
       .DEC_OUT(dec_out)
   );
 
+  // Tristate
+  wire [7:0] BufferedBusData;
+  reg [7:0] DataBusOut;
+  reg DataBusOutWE;
+
   integer i;
   always @(posedge CLK) begin
     if (RESET) for (i = 0; i < 6; i = i + 1) regBank[i] <= 8'h0;
