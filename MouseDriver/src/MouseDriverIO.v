@@ -73,7 +73,6 @@ module MouseDriverIO (
   // Create register bank, holds device state.
   reg [7:0] regBank[5:0];
 
-  integer i;
   always @(posedge CLK) begin
     regBank[0] <= {2'b00, status_mouse};
     regBank[1] <= x_mouse;
