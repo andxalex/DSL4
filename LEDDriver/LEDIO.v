@@ -8,11 +8,11 @@ module LEDIO (
     input  [7:0] BUS_ADDR,
     input        BUS_WE,
     //OUT
-    output [7:0] LED_OUT,
+    output [7:0] LED_OUT
 
 );
 
-  
+
   // Register bank, holds device state
   reg [7:0] regBank;
 
@@ -35,24 +35,20 @@ module LEDIO (
 
   always @(posedge CLK) begin
 
-    if(RESET) begin
-        DataBusOutWE <= 1'b0;
-        regBank <= 8'h0;
-    end    
-
-    if(BUS_ADDR == BaseAddr) begin
-
-        if(BUS_WE) begin
-             DataBusOutWE <= 1'b0;
-            regBank <= BufferedBusData;
-
-        end
-
-        else DataBusOutWE <= 1'b1;
-
+    if (RESET) begin
+      DataBusOutWE <= 1'b0;
+      regBank <= 8'h0;
     end
 
-    else DataBusOutWE <= 1'b0;
+    if (BUS_ADDR == BaseAddr) begin
+
+      if (BUS_WE) begin
+        DataBusOutWE <= 1'b0;
+        regBank <= BufferedBusData;
+
+      end else DataBusOutWE <= 1'b1;
+
+    end else DataBusOutWE <= 1'b0;
 
     DataBusOut <= regBank;
 
@@ -60,4 +56,4 @@ module LEDIO (
 
 endmodule
 
-	
+
