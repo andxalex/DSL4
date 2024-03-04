@@ -5,7 +5,7 @@
 // 
 // Create Date: 26.01.2024 14:00:35
 // Design Name: 
-// Module Name: VGA_top_wrapper
+// Module Name: VGA_Bus
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -90,6 +90,30 @@ assign Y_ADDR = (ADDR == 8'hB0) ? 1'b1 : 1'b0;
 assign X_ADDR = (ADDR == 8'hB1) ? 1'b1 : 1'b0;
 assign DATA_IN = (ADDR == 8'hB2) ? 1'b1 : 1'b0;
 //////////////////////////////////////////////////////////////////////////////////
+
+always @(posedge CLK) begin
+
+  if(WE) begin
+
+    if(Y_ADDR) begin
+
+      TOT_ADDRESS[14:8] <= DATA;
+    end
+
+    if(X_ADDR) begin
+      TOT_ADDRESS[7:0] <= DATA;
+    end
+
+    if(DATA_IN) begin
+      DATA_IN <= DATA[0];
+      
+
+    end
+
+
+  end
+  
+end
 
 
 
