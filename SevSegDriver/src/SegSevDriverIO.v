@@ -35,14 +35,7 @@ module SegSevDriverIO (
   reg [7:0] DataBusOut;
   reg DataBusOutWE;
 
-  integer i;
-  always @(posedge CLK) begin
-    if (RESET) for (i = 0; i < 6; i = i + 1) regBank[i] <= 8'h0;
-    else begin
-      regBank[4] <= dec_out;
-      regBank[5] <= {4'h0, seg_select};
-    end
-  end
+
 
   // The register bank is effectively an extension of Data memory. The Base address below 
   // corresponds to regBank[0]
@@ -55,9 +48,12 @@ module SegSevDriverIO (
   assign BufferedBusData = BUS_DATA;
 
   // dual port RAM (from the view of the processor)
+  integer i;
   always @(posedge CLK) begin
     if (RESET) begin
+      // If reset, re-init regbank to 0.
       DataBusOutWE <= 1'b0;
+      for (i = 0; i < 6; i = i + 1) regBank[i] <= 8'h0;
     end else if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < BaseAddr + 6)) begin
       // Only first 4 addresses are writable
       if (BUS_WE) begin
@@ -65,7 +61,11 @@ module SegSevDriverIO (
         if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < BaseAddr + 4)) begin
           regBank[BUS_ADDR-BaseAddr] <= BufferedBusData;
         end
-      end else DataBusOutWE <= 1'b1;
+      end else begin
+        DataBusOutWE <= 1'b1;
+        regBank[4]   <= dec_out;
+        regBank[5]   <= {4'h0, seg_select};
+      end
     end else DataBusOutWE <= 1'b0;
 
     DataBusOut <= regBank[BUS_ADDR-BaseAddr];
