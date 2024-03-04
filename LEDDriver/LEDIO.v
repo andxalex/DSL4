@@ -2,6 +2,7 @@
 
 module LEDIO (
     input        CLK,
+    input        RESET,
     //BUS
     inout  [7:0] BUS_DATA,
     input  [7:0] BUS_ADDR,
