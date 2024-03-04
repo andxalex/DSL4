@@ -112,7 +112,16 @@ always @(posedge CLK) begin
       TOT_ADDRESS <= TOT_ADDRESS;
       BUFFER_WE <= 1'b1;
     end
-  end 
+  end
+
+  else begin
+    TOT_ADDRESS <= TOT_ADDRESS;
+    BUFFER_DATA <= BUFFER_DATA;
+    BUFFER_WE <= BUFFER_WE;
+
+  end
+
+
 end
 //////////////////////////////////////////////////////////////////////////////////
 
