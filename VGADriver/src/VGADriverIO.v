@@ -28,11 +28,11 @@ module VGADriverIO (
     //Inputs from Buses
     input      [7:0]   ADDRESS,
     input      [7:0]   DATA,
-    input              WE,
+    input              BUS_WE,
 
   
     //Outputs to VGA
-    output              A_DATA_OUT,
+    //output              A_DATA_OUT, Still have no clue why you would need this output
     output              VGA_HS,
     output              VGA_VS,
     output     [7:0]    VGA_COLOUR
@@ -43,8 +43,8 @@ module VGADriverIO (
 //Instantiate Registers and Wires 
 
 reg [14:0] TOT_ADDRESS;
-reg        DATA_IN;
-reg        BUFFED_WE;
+reg        BUFFER_DATA;
+reg        BUFFER_WE;
 reg        CONFIG_COLOURS = 16'b0011001100110011;
 
 wire       drp_clk;
@@ -57,8 +57,8 @@ wire       b_data;
      Frame_Buffer frame_buffer (
        .A_CLK(CLK),
        .A_ADDR(TOT_ADDRESS),
-       .A_DATA_IN(DATA_IN),
-       .A_WE(BUFFED_WE),
+       .A_DATA_IN(BUFFER_DATA),
+       .A_WE(BUFFER_WE),
        .B_CLK(drp_clk),
        .B_ADDR(vga_addr),
        .A_DATA_OUT(A_DATA_OUT),
@@ -93,28 +93,28 @@ assign DATA_IN = (ADDR == 8'hB2) ? 1'b1 : 1'b0;
 
 always @(posedge CLK) begin
 
-  if(WE) begin
+  if(BUS_WE) begin
 
+    //MSBs are Y axis
     if(Y_ADDR) begin
-
       TOT_ADDRESS[14:8] <= DATA;
+      BUFFER_WE <= 1'b0;
     end
 
+    //LSBs are X axis
     if(X_ADDR) begin
       TOT_ADDRESS[7:0] <= DATA;
+      BUFFER_WE <= 1'b0;
     end
 
     if(DATA_IN) begin
-      DATA_IN <= DATA[0];
-      
-
+      BUFFER_DATA <= DATA[0];
+      TOT_ADDRESS <= TOT_ADDRESS;
+      BUFFER_WE <= 1'b1;
     end
-
-
-  end
-  
+  end 
 end
-
+//////////////////////////////////////////////////////////////////////////////////
 
 
 endmodule
