@@ -34,11 +34,16 @@ module LEDIO (
 
   always @(posedge CLK) begin
 
+    if(RESET) begin
+        DataBusOutWE <= 1'b0;
+        regBank <= 8'h0;
+    end    
+
     if(BUS_ADDR == BaseAddr) begin
 
         if(BUS_WE) begin
              DataBusOutWE <= 1'b0;
-            regBank[BUS_ADDR-BaseAddr] <= BufferedBusData;
+            regBank <= BufferedBusData;
 
         end
 
