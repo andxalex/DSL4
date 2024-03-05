@@ -44,9 +44,7 @@ module LEDIO (
         if (BUS_WE) begin
           DataBusOutWE <= 1'b0;
           regBank[BUS_ADDR-BaseAddr] <= BufferedBusData;
-
         end else DataBusOutWE <= 1'b1;
-
       end else DataBusOutWE <= 1'b0;
     end
     DataBusOut <= regBank[BUS_ADDR-BaseAddr];
