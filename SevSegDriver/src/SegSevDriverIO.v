@@ -44,7 +44,7 @@ module SegSevDriverIO (
   // Only place data on the bus if processor is not writing, and address is within range
   assign BUS_DATA = (DataBusOutWE) ? DataBusOut : 8'hZZ;
 
-  //Buffer 
+  // Buffer 
   assign BufferedBusData = BUS_DATA;
 
   // dual port RAM (from the view of the processor)
