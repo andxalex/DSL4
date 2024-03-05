@@ -11,7 +11,7 @@ module System (
     // inout CLK_MOUSE,
     // inout DATA_MOUSE,
     // OUT
-    // output [15:0] LED_OUT,
+    output [15:0] LED_OUT,
     output [3:0] SEG_SELECT,
     output [7:0] DEC_OUT
 );
@@ -69,6 +69,15 @@ module System (
       .BUS_WE(bus_we),
       .SEG_SELECT(SEG_SELECT),
       .DEC_OUT(DEC_OUT)
+  );
+
+  LEDIO rgb (
+      .CLK(CLK),
+      .RESET(RESET),
+      .BUS_DATA(bus_data),
+      .BUS_ADDR(bus_addr),
+      .BUS_WE(bus_we),
+      .LED_OUT(LED_OUT)
   );
 
 endmodule

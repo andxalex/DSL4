@@ -1,20 +1,20 @@
 `timescale 1ns / 1ps
 
 module LEDIO (
-    input        CLK,
-    input        RESET,
+    input         CLK,
+    input         RESET,
     //BUS
-    inout  [7:0] BUS_DATA,
-    input  [7:0] BUS_ADDR,
-    input        BUS_WE,
+    inout  [ 7:0] BUS_DATA,
+    input  [ 7:0] BUS_ADDR,
+    input         BUS_WE,
     //OUT
-    output [7:0] LED_OUT
+    output [15:0] LED_OUT
 
 );
 
 
   // Register bank, holds device state
-  reg [7:0] regBank;
+  reg [7:0] regBank[1:0];
 
   // Tristate
   wire [7:0] BufferedBusData;
@@ -37,22 +37,22 @@ module LEDIO (
 
     if (RESET) begin
       DataBusOutWE <= 1'b0;
-      regBank <= 8'h0;
+      regBank[0]   <= 8'h0;
+      regBank[1]   <= 8'h0;
+    end else begin
+      if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < (BaseAddr + 2))) begin
+        if (BUS_WE) begin
+          DataBusOutWE <= 1'b0;
+          regBank[BUS_ADDR-BaseAddr] <= BufferedBusData;
+
+        end else DataBusOutWE <= 1'b1;
+
+      end else DataBusOutWE <= 1'b0;
     end
-
-    if (BUS_ADDR == BaseAddr) begin
-
-      if (BUS_WE) begin
-        DataBusOutWE <= 1'b0;
-        regBank <= BufferedBusData;
-
-      end else DataBusOutWE <= 1'b1;
-
-    end else DataBusOutWE <= 1'b0;
-
-    DataBusOut <= regBank;
-
+    DataBusOut <= regBank[BUS_ADDR-BaseAddr];
   end
+
+  assign LED_OUT = {regBank[1], regBank[0]};
 
 endmodule
 
