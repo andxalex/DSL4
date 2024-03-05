@@ -108,7 +108,7 @@ def main():
     # Pad output
     num_lines = sum (1 for _ in open(f"{output_file}", 'r'))
     fout = open(f"{output_file}", "a+")
-    for _ in range(num_lines,255):
+    for _ in range(num_lines,255-1):
         fout.write('0x0F' + '\n')
     fout.write('0x00')
 

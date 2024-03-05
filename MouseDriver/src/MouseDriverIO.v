@@ -93,7 +93,7 @@ module MouseDriverIO (
     if (RESET) begin
       DataBusOutWE <= 1'b0;
       for (i = 0; i < 8; i = i + 1) regBank[i] <= 0'h00;
-    end else if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < BaseAddr + 6)) begin
+    end else if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < BaseAddr + 8)) begin
       // Only first 2 addresses are writable
       if (BUS_WE) begin
         DataBusOutWE <= 1'b0;
