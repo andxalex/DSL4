@@ -59,7 +59,7 @@ module SegSevDriverIO (
       if (BUS_WE) begin
         DataBusOutWE <= 1'b0;
         if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < BaseAddr + 4)) begin
-          regBank[BUS_ADDR-BaseAddr] <= BufferedBusData;
+          regBank[BUS_ADDR-BaseAddr] <= {4'h0, BufferedBusData[3:0]};
         end
       end else begin
         DataBusOutWE <= 1'b1;

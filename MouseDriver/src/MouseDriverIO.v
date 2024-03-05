@@ -3,16 +3,19 @@
 module MouseDriverIO (
     input        CLK,
     input        RESET,
-    //BUS
+    // CTRL 
+    input        INC_SENS,
+    input        RED_SENS,
+    // BUS
     inout  [7:0] BUS_DATA,
     input  [7:0] BUS_ADDR,
     input        BUS_WE,
-    //MOUSE
+    // MOUSE
     inout        CLK_MOUSE,
     inout        DATA_MOUSE,
-    //INTERRUPT
+    // INTERRUPT
     output       BUS_INTERRUPT_RAISE,
-    input  [1:0] BUS_INTERRUPTS_ACK
+    input        BUS_INTERRUPT_ACK
 );
 
   wire [5:0] status_mouse;
@@ -20,7 +23,7 @@ module MouseDriverIO (
   wire [7:0] y_mouse;
   wire [2:0] z_mouse;
 
-  //Additional wires
+  // Additional wires
   wire [6:0] MSM_state;
   wire intellimouse;
   wire explorer;
@@ -29,12 +32,12 @@ module MouseDriverIO (
   wire [4:0] y;
   wire SendInterrupt;
 
-  //Instantiate mouse transceiver
+  // Instantiate mouse transceiver
   MouseTransceiver TR (
       .RESET(RESET),
       .CLK(CLK),
-      .INC_SENS(BtnRDly & ~BTN_R),
-      .RED_SENS(BtnLDly & ~BTN_L),
+      .INC_SENS(INC_SENS),
+      .RED_SENS(RED_SENS),
       .CLK_MOUSE(CLK_MOUSE),
       .DATA_MOUSE(DATA_MOUSE),
       .MouseStatus(status_mouse),
@@ -42,7 +45,7 @@ module MouseDriverIO (
       .MouseY(y_mouse),
       .MouseZ(z_mouse),
 
-      //Additional outputs
+      // Additional outputs
       .MSM_STATE(MSM_state),
       .INTELLIMOUSE(intellimouse),
       .EXPLORER(explorer),
@@ -59,7 +62,7 @@ module MouseDriverIO (
     if (RESET) InterruptState = 0;
     else begin
       if (SendInterrupt) InterruptState = 1;
-      else if (BUS_INTERRUPTS_ACK[0]) InterruptState = 0;
+      else if (BUS_INTERRUPT_ACK) InterruptState = 0;
     end
   end
   assign BUS_INTERRUPT_RAISE = InterruptState;
@@ -84,7 +87,7 @@ module MouseDriverIO (
   // Buffer 
   assign BufferedBusData = BUS_DATA;
 
-  //dual port RAM (from the view of the processor)
+  // dual port RAM (from the view of the processor)
   integer i;
   always @(posedge CLK) begin
     if (RESET) begin
@@ -94,13 +97,13 @@ module MouseDriverIO (
       // Only first 2 addresses are writable
       if (BUS_WE) begin
         DataBusOutWE <= 1'b0;
-        if ((BUS_ADDR >= Base_Addr) & (BUS_ADDR < Base_Addr + 2)) begin
-          regBank[BUS_ADDR-Base_Addr] <= BufferedBusData;
+        if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < BaseAddr + 2)) begin
+          regBank[BUS_ADDR-BaseAddr] <= BufferedBusData;
         end
       end else begin
         DataBusOutWE <= 1'b1;
-        regBank[0]   <= {7'h00, red_sens};
-        regBank[1]   <= {7'h00, inc_sens};
+        regBank[0]   <= {7'h00, RED_SENS};
+        regBank[1]   <= {7'h00, INC_SENS};
         regBank[2]   <= {2'b00, status_mouse};
         regBank[3]   <= x_mouse;
         regBank[4]   <= y_mouse;

@@ -5,11 +5,11 @@ module System (
     input CLK,
     input RESET,
     // CTRL
-    // input BTN_L,
-    // input BTN_R,
+    input BTN_L,
+    input BTN_R,
     // MOUSE
-    // inout CLK_MOUSE,
-    // inout DATA_MOUSE,
+    inout CLK_MOUSE,
+    inout DATA_MOUSE,
     // OUT
     output [15:0] LED_OUT,
     output [3:0] SEG_SELECT,
@@ -22,7 +22,7 @@ module System (
   wire bus_we;
   wire [7:0] rom_addr;
   wire [7:0] rom_data;
-  wire [1:0] bus_interrupt_raise;
+  wire [1:0] bus_interrupts_raise;
   wire [1:0] bus_interrupts_ack;
 
 
@@ -34,7 +34,7 @@ module System (
       .BUS_WE(bus_we),
       .ROM_ADDRESS(rom_addr),
       .ROM_DATA(rom_data),
-      .BUS_INTERRUPTS_RAISE(bus_interrupt_raise),
+      .BUS_INTERRUPTS_RAISE(bus_interrupts_raise),
       .BUS_INTERRUPTS_ACK(bus_interrupts_ack)
   );
 
@@ -57,7 +57,7 @@ module System (
       .BUS_DATA(bus_data),
       .BUS_ADDR(bus_addr),
       .BUS_WE(bus_we),
-      .BUS_INTERRUPT_RAISE(bus_interrupt_raise[0]),
+      .BUS_INTERRUPT_RAISE(bus_interrupts_raise[0]),
       .BUS_INTERRUPT_ACK(bus_interrupts_ack[0])
   );
 
@@ -78,6 +78,27 @@ module System (
       .BUS_ADDR(bus_addr),
       .BUS_WE(bus_we),
       .LED_OUT(LED_OUT)
+  );
+
+  // Debounce buttons
+  reg BtnLDly, BtnRDly;
+  always @(posedge CLK) begin
+    BtnLDly <= BTN_L;
+    BtnRDly <= BTN_R;
+  end
+
+  MouseDriverIO logitech_g1_pro (
+      .CLK(CLK),
+      .RESET(RESET),
+      .INC_SENS(BtnRDly & ~BTN_R),
+      .RED_SENS(BtnLDly & ~BTN_L),
+      .BUS_DATA(bus_data),
+      .BUS_ADDR(bus_addr),
+      .BUS_WE(bus_we),
+      .CLK_MOUSE(CLK_MOUSE),
+      .DATA_MOUSE(DATA_MOUSE),
+      .BUS_INTERRUPT_RAISE(bus_interrupts_raise[1]),
+      .BUS_INTERRUPT_ACK(bus_interrupts_ack[1])
   );
 
 endmodule
