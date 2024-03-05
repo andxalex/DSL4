@@ -375,14 +375,14 @@ module Processor (
 
       // Wait for ROM to settle
       GOTO_IDLE: begin
-        NextProgCounter = NextProgCounter + 1;  //? Should the counter be reset here?
-        NextState = GOTO_IDLE_0;
+        // NextProgCounter = NextProgCounter + 1;  //? Should the counter be reset here?
+        NextState = IDLE;
       end
 
       // Wait for ROM to settle again.
-      GOTO_IDLE_0: begin
-        NextState = IDLE;
-      end
+      // GOTO_IDLE_0: begin
+      //   NextState = IDLE;
+      // end
 
       ///////////////////////////////////////////////////////////////////////////////////////
       //FUNC CALL ADDR: JUMP and LINK pipeline:
