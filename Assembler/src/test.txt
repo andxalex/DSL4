@@ -1,2 +1,2 @@
-dfa
-dfb
+lda 1
+ldb 1

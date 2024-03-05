@@ -24,6 +24,10 @@ def get_parser():
 opcodes = {
     "alu": "0100",
     "blu": "0101",
+    "lda": "00000000",
+    "ldb": "00000001",
+    "sta": "00000010",
+    "stb": "00000011",
     "beq": "10010110",
     "bgt": "10100110",
     "blt": "10110110",
@@ -58,8 +62,7 @@ def encode_no_operand(instruction):
 # Function to encode branch and jump instructions with address
 def encode_with_address(instruction, address):
     opcode = opcodes[instruction]
-    address_bin = format(address, '08b')  # Convert address to 8-bit binary
-    return hex(int(opcode[:4] + address_bin,2))
+    return hex(int(opcode,2)) +'\n'+ address
 
 # Function to encode alu ops
 def encode_alu(op_code, alu_opcode):
@@ -71,15 +74,17 @@ def parse_and_encode(instruction_line):
     # Split once for comments
     instruction = instruction_line.split("//", 1)[0]
     # Split further
-    split_instruct = instruction.split("\n")
+    split_instruct = instruction.split(" ")
+
     opcode = split_instruct[0]
+    print(opcode)
     
     if opcode in ["alu", "blu"]:
         return encode_alu(opcode, split_instruct[1])
-    if opcode in ["gto", "beq", "bgt", "blt", "fnc"]:
-        return encode_with_address(instruction, int(split_instruct[1]))
+    if opcode in ["lda","ldb", "sta","stb","gto", "beq", "bgt", "blt", "fnc"]:
+        return encode_with_address(opcode, int(split_instruct[1]))
     else:
-        return encode_no_operand(instruction)
+        return encode_no_operand(opcode)
 
 def main():
     # Parse args
@@ -94,6 +99,7 @@ def main():
 
     # Iterate and translate
     for line in fin.read().splitlines():
+    #    parse_and_encode(line)
        fout.write(parse_and_encode(line) + '\n')
     
 
