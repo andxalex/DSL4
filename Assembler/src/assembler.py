@@ -1,30 +1,38 @@
 import argparse
 
 
+# Parser
 def get_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--file",
+        "--infile",
         type=str,
         required=True,
         help="assembly text file",
     )
 
+    parser.add_argument(
+        "--outfile",
+        type=str,
+        default = "output.txt",
+        required=False,
+        help= "output text file",
+    )
     return parser
 
 # Define opcodes for instructions
 opcodes = {
-    "ALU_OP_A": "0100",
-    "ALU_OP_B": "0101",
-    "BREQ": "10010110",
-    "BGTQ": "10100110",
-    "BLTQ": "10110110",
-    "GOTO": "xxxx0111",
-    "GOTO_IDLE": "xxxx1000",
-    "FUNCTION_CALL": "xxxx1001",
-    "RETURN": "xxxx1010",
-    "DEREF_A": "xxxx1011",
-    "DEREF_B": "xxxx1100",
+    "alu": "0100",
+    "blu": "0101",
+    "beq": "10010110",
+    "bgt": "10100110",
+    "blt": "10110110",
+    "gto": "00000111",
+    "gti": "00001000",
+    "fnc": "00001001",
+    "ret": "00001010",
+    "dfa": "00001011",
+    "dfb": "00001100",
 }
 
 # Define opcodes for ALU;
@@ -40,25 +48,36 @@ alu_opcodes = {
     "bmm": "1000",
     "equ": "1001",
     "gte": "1010",
-                "lte": "1011",
+    "lte": "1011",
 }
 
 # Function to encode instructions with no operands
 def encode_no_operand(instruction):
-    return opcodes[instruction]
+    return hex(int(opcodes[instruction],2))
 
 # Function to encode branch and jump instructions with address
 def encode_with_address(instruction, address):
     opcode = opcodes[instruction]
     address_bin = format(address, '08b')  # Convert address to 8-bit binary
-    return opcode[:4] + address_bin
+    return hex(int(opcode[:4] + address_bin,2))
+
+# Function to encode alu ops
+def encode_alu(op_code, alu_opcode):
+    return hex(int(alu_opcodes[alu_opcode] + opcodes[op_code],2))
+
 
 # Function to parse and encode a single instruction
 def parse_and_encode(instruction_line):
-    parts = instruction_line.split()
-    instruction = parts[0]
-    if instruction in ["GOTO", "BREQ", "BGTQ", "BLTQ", "FUNCTION_CALL"]:
-        return encode_with_address(instruction, int(parts[1]))
+    # Split once for comments
+    instruction = instruction_line.split("//", 1)[0]
+    # Split further
+    split_instruct = instruction.split("\n")
+    opcode = split_instruct[0]
+    
+    if opcode in ["alu", "blu"]:
+        return encode_alu(opcode, split_instruct[1])
+    if opcode in ["gto", "beq", "bgt", "blt", "fnc"]:
+        return encode_with_address(instruction, int(split_instruct[1]))
     else:
         return encode_no_operand(instruction)
 
@@ -66,15 +85,17 @@ def main():
     # Parse args
     parser = get_parser()
     args = parser.parse_args()
-    file = args.file
+    input_file = args.infile
+    output_file = args.outfile
 
-    # Open file
-    f = open(f"{file}", "r")
+    # Open files
+    fin = open(f"{input_file}", "r")
+    fout = open(f"{output_file}", "w+")
 
     # Iterate and translate
-    for line in f:
-        parse_and_encode(line)
-
+    for line in fin.read().splitlines():
+       fout.write(parse_and_encode(line) + '\n')
+    
 
 if __name__ == "__main__":
     main()
