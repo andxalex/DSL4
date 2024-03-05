@@ -1,4 +1,8 @@
 lda 0xA4
+alu sra
+alu sra
+alu sra
+alu sra
 sta 0xC1
 lda 0xA3
 sta 0xC0
