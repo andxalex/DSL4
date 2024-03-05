@@ -57,16 +57,16 @@ alu_opcodes = {
 
 # Function to encode instructions with no operands
 def encode_no_operand(instruction):
-    return hex(int(opcodes[instruction],2))
+    return '0x' + format(int(opcodes[instruction],2), '02x')
 
 # Function to encode branch and jump instructions with address
 def encode_with_address(instruction, address):
     opcode = opcodes[instruction]
-    return hex(int(opcode,2)) +'\n'+ address
+    return '0x' + format(int(opcode,2), '02x') +'\n'+ address
 
 # Function to encode alu ops
 def encode_alu(op_code, alu_opcode):
-    return hex(int(alu_opcodes[alu_opcode] + opcodes[op_code],2))
+    return '0x' + format(int(alu_opcodes[alu_opcode] + opcodes[op_code],2), '02x')
 
 
 # Function to parse and encode a single instruction
@@ -98,16 +98,23 @@ def main():
     fout = open(f"{output_file}", "w+")
 
     # Iterate and translate
-    count = 0
     for line in fin.read().splitlines():
-    #    parse_and_encode(line)
        fout.write(parse_and_encode(line) + '\n')
-    #    count += 
-    
-    # for i in range(count, 256):
-    #     fout.write('0x0F' + '\n')
-    #     if i == 255:
-    #         fout.write('0x00')
+
+    # Close files
+    fin.close()
+    fout.close()
+
+    # Pad output
+    num_lines = sum (1 for _ in open(f"{output_file}", 'r'))
+    fout = open(f"{output_file}", "a+")
+    for _ in range(num_lines,255):
+        fout.write('0x0F' + '\n')
+    fout.write('0x00')
+
+    # Close output file again
+    fout.close()
+
     
 
 if __name__ == "__main__":
