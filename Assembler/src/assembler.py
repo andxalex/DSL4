@@ -14,7 +14,7 @@ def get_parser():
     parser.add_argument(
         "--outfile",
         type=str,
-        default = "output.txt",
+        default = "../../Core/src/Complete_Demo_ROM.txt",
         required=False,
         help= "output text file",
     )
