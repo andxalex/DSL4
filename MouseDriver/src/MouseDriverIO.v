@@ -93,26 +93,25 @@ module MouseDriverIO (
     if (RESET) begin
       DataBusOutWE <= 1'b0;
       for (i = 0; i < 8; i = i + 1) regBank[i] <= 0'h00;
-    end else if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < BaseAddr + 8)) begin
-      // Only first 2 addresses are writable
-      if (BUS_WE) begin
-        DataBusOutWE <= 1'b0;
-        if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < BaseAddr + 2)) begin
-          regBank[BUS_ADDR-BaseAddr] <= BufferedBusData;
-        end
-      end else begin
-        DataBusOutWE <= 1'b1;
-        regBank[0]   <= {7'h00, RED_SENS};
-        regBank[1]   <= {7'h00, INC_SENS};
-        regBank[2]   <= {2'b00, status_mouse};
-        regBank[3]   <= x_mouse;
-        regBank[4]   <= y_mouse;
-        regBank[5]   <= z_mouse;
-        regBank[6]   <= {1'b0, intellimouse, explorer, x};
-        regBank[7]   <= {1'b0, sensitivity, y};
-      end
-    end else DataBusOutWE <= 1'b0;
+    end else begin
+      regBank[2] <= {2'b00, status_mouse};
+      regBank[3] <= x_mouse;
+      regBank[4] <= y_mouse;
+      regBank[5] <= z_mouse;
+      regBank[6] <= {1'b0, intellimouse, explorer, x};
+      regBank[7] <= {1'b0, sensitivity, y};
 
-    DataBusOut <= regBank[BUS_ADDR-BaseAddr];
+      if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < BaseAddr + 8)) begin
+        // Only first 2 addresses are writable
+        if (BUS_WE) begin
+          DataBusOutWE <= 1'b0;
+          if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < BaseAddr + 2)) begin
+            regBank[BUS_ADDR-BaseAddr] <= BufferedBusData;
+          end
+        end else DataBusOutWE <= 1'b1;
+      end else DataBusOutWE <= 1'b0;
+
+      DataBusOut <= regBank[BUS_ADDR-BaseAddr];
+    end
   end
 endmodule

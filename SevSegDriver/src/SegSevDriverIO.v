@@ -54,21 +54,21 @@ module SegSevDriverIO (
       // If reset, re-init regbank to 0.
       DataBusOutWE <= 1'b0;
       for (i = 0; i < 6; i = i + 1) regBank[i] <= 8'h0;
-    end else if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < BaseAddr + 6)) begin
-      // Only first 4 addresses are writable
-      if (BUS_WE) begin
-        DataBusOutWE <= 1'b0;
-        if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < BaseAddr + 4)) begin
-          regBank[BUS_ADDR-BaseAddr] <= {4'h0, BufferedBusData[3:0]};
-        end
-      end else begin
-        DataBusOutWE <= 1'b1;
-        regBank[4]   <= dec_out;
-        regBank[5]   <= {4'h0, seg_select};
-      end
-    end else DataBusOutWE <= 1'b0;
+    end else begin
+      regBank[4] <= dec_out;
+      regBank[5] <= {4'h0, seg_select};
+      if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < BaseAddr + 6)) begin
+        // Only first 4 addresses are writable
+        if (BUS_WE) begin
+          DataBusOutWE <= 1'b0;
+          if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < BaseAddr + 4)) begin
+            regBank[BUS_ADDR-BaseAddr] <= {4'h0, BufferedBusData[3:0]};
+          end
+        end else DataBusOutWE <= 1'b1;
+      end else DataBusOutWE <= 1'b0;
 
-    DataBusOut <= regBank[BUS_ADDR-BaseAddr];
+      DataBusOut <= regBank[BUS_ADDR-BaseAddr];
+    end
   end
 
   assign SEG_SELECT = seg_select;
