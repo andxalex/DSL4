@@ -19,14 +19,14 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-module VGADriverIO (
+module VGADriverIO_2 (
 
     //Global  
     input               CLK,           // System clock
     input               RESET,         // System reset
     
     //Inputs from Buses
-    input      [7:0]   ADDRESS,
+    inout      [7:0]   ADDRESS,
     input      [7:0]   DATA,
     input              BUS_WE,
 
@@ -39,28 +39,43 @@ module VGADriverIO (
 
 );
 //////////////////////////////////////////////////////////////////////////////////
+// Register bank, holds device state
+  reg [7:0] regBank[3:0];
 
-//Instantiate Registers and Wires 
+  // Tristate
+  wire [7:0] BufferedBusData;
+  reg [7:0] DataBusOut;
+  reg DataBusOutWE;
 
-reg [14:0] TOT_ADDRESS;
-reg        BUFFER_DATA;
-reg        BUFFER_WE;
-reg        CONFIG_COLOURS = 16'b1111111111111111;
+
+
+  // The register bank is effectively an extension of Data memory. The Base address below 
+  // corresponds to regBank[0]
+  parameter BaseAddr = 8'hB0;
+
+  // Only place data on the bus if processor is not writing, and address is within range
+  assign BUS_DATA = (DataBusOutWE) ? DataBusOut : 8'hZZ;
+
+  //Buffer 
+  assign BufferedBusData = BUS_DATA;
 
 wire       drp_clk;
 wire [14:0]   vga_addr;
 wire       b_data;
 
-initial TOT_ADDRESS = 15'b0;
+
+
+reg        CONFIG_COLOURS = 16'b1111111111111111;
+
 
 //////////////////////////////////////////////////////////////////////////////////
 
    // Instantiate Frame_Buffer and VGA_Sig_Gen modules
      Frame_Buffer frame_buffer (
        .A_CLK(CLK),
-       .A_ADDR(TOT_ADDRESS),
-       .A_DATA_IN(BUFFER_DATA),
-       .A_WE(BUFFER_WE),
+       .A_ADDR({regBank[0], regBank[1]}),
+       .A_DATA_IN(regBank[2][0]),
+       .A_WE(regBank[3][0]),
        .B_CLK(drp_clk),
        .B_ADDR(vga_addr),
        .A_DATA_OUT(A_DATA_OUT),
@@ -81,50 +96,27 @@ initial TOT_ADDRESS = 15'b0;
        .VGA_COLOUR(VGA_COLOUR)
      );
 ////////////////////////////////////////////////////////////////////////////////// 
+  always @(posedge CLK) begin
 
-//Create States
+    if (RESET) begin
+      DataBusOutWE <= 1'b0;
+      regBank[0]   <= 8'h0;
+      regBank[1]   <= 8'h0;
+      regBank[2]   <= 8'h0;
+      regBank[3]   <= 8'h0;
+    end else begin
+      if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < (BaseAddr + 4))) begin
+        if (BUS_WE) begin
+          DataBusOutWE <= 1'b0;
+          regBank[BUS_ADDR-BaseAddr] <= BufferedBusData;
 
-wire GVIE_X;
-wire GIVE_Y;
-//wire DATA;
+        end else DataBusOutWE <= 1'b1;
 
-assign Y_ADDR = (ADDRESS == 8'hB0) ? 1'b1 : 1'b0;
-assign X_ADDR = (ADDRESS == 8'hB1) ? 1'b1 : 1'b0;
-assign DATA_IN = (ADDRESS == 8'hB2) ? 1'b1 : 1'b0;
-//////////////////////////////////////////////////////////////////////////////////
-
-always @(posedge CLK) begin
-
-  if(BUS_WE) begin
-
-    //MSBs are Y axis
-    if(Y_ADDR) begin
-      TOT_ADDRESS[14:8] <= DATA;
-      BUFFER_WE <= 1'b0;
+      end else DataBusOutWE <= 1'b0;
     end
-
-    //LSBs are X axis
-    if(X_ADDR) begin
-      TOT_ADDRESS[7:0] <= DATA;
-      BUFFER_WE <= 1'b0;
-    end
-
-    if(DATA_IN) begin
-      BUFFER_DATA <= DATA[0];
-      TOT_ADDRESS <= TOT_ADDRESS;
-      BUFFER_WE <= 1'b1;
-    end
+    DataBusOut <= regBank[BUS_ADDR-BaseAddr];
   end
 
-  else begin
-    TOT_ADDRESS <= TOT_ADDRESS;
-    BUFFER_DATA <= BUFFER_DATA;
-    BUFFER_WE <= BUFFER_WE;
-
-  end
-
-
-end
 //////////////////////////////////////////////////////////////////////////////////
 
 

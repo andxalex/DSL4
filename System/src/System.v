@@ -105,7 +105,7 @@ module System (
       .BUS_INTERRUPT_ACK(bus_interrupts_ack[1])
   );
 //////////////////////////////////////////////////////////////////////////////////
- VGADriverIO to_mouni(
+ VGADriverIO_2 to_mouni(
     .CLK(CLK),           
     .RESET(RESET),         
     .ADDRESS(bus_addr),
