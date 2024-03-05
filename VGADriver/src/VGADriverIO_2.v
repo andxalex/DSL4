@@ -21,14 +21,12 @@
 
 module VGADriverIO_2 (
 
-    //Global  
-    input               CLK,           // System clock
-    input               RESET,         // System reset
-    
-    //Inputs from Buses
-    inout      [7:0]   ADDRESS,
-    input      [7:0]   DATA,
-    input              BUS_WE,
+    input         CLK,
+    input         RESET,
+    //BUS
+    inout  [ 7:0] BUS_DATA,
+    input  [ 7:0] BUS_ADDR,
+    input         BUS_WE,
 
   
     //Outputs to VGA
@@ -65,7 +63,7 @@ wire       b_data;
 
 
 
-reg        CONFIG_COLOURS = 16'b1111111111111111;
+reg        CONFIG_COLOURS = 16'b1110011110011111;
 
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -73,9 +71,9 @@ reg        CONFIG_COLOURS = 16'b1111111111111111;
    // Instantiate Frame_Buffer and VGA_Sig_Gen modules
      Frame_Buffer frame_buffer (
        .A_CLK(CLK),
-       .A_ADDR({regBank[0], regBank[1]}),
-       .A_DATA_IN(regBank[2][0]),
-       .A_WE(regBank[3][0]),
+       .A_ADDR(15'b100000010000000),
+       .A_DATA_IN(1'b1),
+       .A_WE(1'b1),
        .B_CLK(drp_clk),
        .B_ADDR(vga_addr),
        .A_DATA_OUT(A_DATA_OUT),
@@ -105,7 +103,7 @@ reg        CONFIG_COLOURS = 16'b1111111111111111;
       regBank[2]   <= 8'h0;
       regBank[3]   <= 8'h0;
     end else begin
-      if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < (BaseAddr + 4))) begin
+      if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < (BaseAddr + 5))) begin
         if (BUS_WE) begin
           DataBusOutWE <= 1'b0;
           regBank[BUS_ADDR-BaseAddr] <= BufferedBusData;
