@@ -84,11 +84,11 @@ wire       b_data;
 
 wire GVIE_X;
 wire GIVE_Y;
-wire DATA;
+//wire DATA;
 
-assign Y_ADDR = (ADDR == 8'hB0) ? 1'b1 : 1'b0;
-assign X_ADDR = (ADDR == 8'hB1) ? 1'b1 : 1'b0;
-assign DATA_IN = (ADDR == 8'hB2) ? 1'b1 : 1'b0;
+assign Y_ADDR = (ADDRESS == 8'hB0) ? 1'b1 : 1'b0;
+assign X_ADDR = (ADDRESS == 8'hB1) ? 1'b1 : 1'b0;
+assign DATA_IN = (ADDRESS == 8'hB2) ? 1'b1 : 1'b0;
 //////////////////////////////////////////////////////////////////////////////////
 
 always @(posedge CLK) begin
