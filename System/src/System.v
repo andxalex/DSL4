@@ -105,16 +105,16 @@ module System (
       .BUS_INTERRUPT_ACK(bus_interrupts_ack[1])
   );
   //////////////////////////////////////////////////////////////////////////////////
-  //   VGADriverIO to_mouni (
-  //       .CLK(CLK),
-  //       .RESET(RESET),
-  //       .ADDRESS(bus_addr),
-  //       .DATA(bus_data),
-  //       .BUS_WE(bus_we),
-  //       .VGA_HS(VGA_HS),
-  //       .VGA_VS(VGA_VS),
-  //       .VGA_COLOUR(VGA_COLOUR)
-  //   );
+  VGADriverIO to_mouni (
+      .CLK(CLK),
+      .RESET(RESET),
+      .ADDRESS(bus_addr),
+      .DATA(bus_data),
+      .BUS_WE(bus_we),
+      .VGA_HS(VGA_HS),
+      .VGA_VS(VGA_VS),
+      .VGA_COLOUR(VGA_COLOUR)
+  );
 
   //////////////////////////////////////////////////////////////////////////////////
 endmodule
