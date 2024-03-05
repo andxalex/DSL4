@@ -77,12 +77,12 @@ def parse_and_encode(instruction_line):
     split_instruct = instruction.split(" ")
 
     opcode = split_instruct[0]
-    print(opcode)
+    # print(opcode)
     
     if opcode in ["alu", "blu"]:
         return encode_alu(opcode, split_instruct[1])
     if opcode in ["lda","ldb", "sta","stb","gto", "beq", "bgt", "blt", "fnc"]:
-        return encode_with_address(opcode, int(split_instruct[1]))
+        return encode_with_address(opcode, split_instruct[1])
     else:
         return encode_no_operand(opcode)
 
@@ -98,9 +98,16 @@ def main():
     fout = open(f"{output_file}", "w+")
 
     # Iterate and translate
+    count = 0
     for line in fin.read().splitlines():
     #    parse_and_encode(line)
        fout.write(parse_and_encode(line) + '\n')
+    #    count += 
+    
+    # for i in range(count, 256):
+    #     fout.write('0x0F' + '\n')
+    #     if i == 255:
+    #         fout.write('0x00')
     
 
 if __name__ == "__main__":

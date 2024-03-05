@@ -1,2 +1,15 @@
-lda 1
-ldb 1
+lda 0x01
+ldb 0x01
+alu add
+alu add
+stb 0xD3
+sta 0xD2
+alu add
+alu add
+alu add
+alu add
+alu add
+alu add
+sta 0xD0
+sta 0xC0
+stb 0xC1
