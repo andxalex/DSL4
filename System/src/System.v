@@ -70,7 +70,7 @@ module System (
 
 
   Processor ryzen_7800x3d (
-      .CLK(deb),
+      .CLK(CLK),
       .RESET(RESET),
       .BUS_DATA(bus_data),
       .BUS_ADDR(bus_addr),
