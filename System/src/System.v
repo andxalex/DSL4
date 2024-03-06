@@ -33,6 +33,8 @@ module System (
   wire [7:0] processor_state;
   wire [7:0] x;
   wire [7:0] y;
+  wire [7:0] rega;
+  wire interrupt;
 
   //////////////////////////////////////////////////////////////////////////////////
   // Debounce buttons
@@ -43,28 +45,44 @@ module System (
   end
 
   // USE BELOW TO CONTROL PROCESSOR FLOW
-  //   assign bus_interrupts_raise[1] = BTN_L;
-  //   assign bus_interrupts_raise[0] = 1'b0;  //BTN_R;
-  //   reg [15:0] debounce_counter;
-  //   reg btn_out;
-  //   always @(posedge CLK)
-  //     if (btn_out == BTN_R) debounce_counter <= 0;
-  //     else debounce_counter <= debounce_counter + 1;
-  //   always @(posedge CLK) if (debounce_counter == 'hFFFF) btn_out <= BTN_R;
+  // assign bus_interrupts_raise[1] = BTN_L;
+  // assign bus_interrupts_raise[0] = 1'b0;  //BTN_R;
+  reg [15:0] debounce_counter;
+  reg deb;
+  reg deb_last;  // To detect the transition and generate a single pulse
+
+  always @(posedge CLK) begin
+    if (BTN_R) begin
+      debounce_counter <= (debounce_counter == 16'hFFFF) ? 16'hFFFF : debounce_counter + 1;
+      // Generate a pulse when the counter transitions from 16'hFFFE to 16'hFFFF
+      if (debounce_counter == 16'hFFFE) begin
+        deb <= 1'b1;
+      end else if (deb != deb_last) begin
+        deb <= 1'b0;  // Ensure deb goes low after the pulse
+      end
+      deb_last <= deb;  // Update last debounced value
+    end else begin
+      debounce_counter <= 0;  // Reset counter when BTN_R is not pressed
+      deb <= 0;  // Ensure deb is low when BTN_R is not pressed
+      deb_last <= 0;  // Reset last debounced value
+    end
+  end
+
 
   Processor ryzen_7800x3d (
-      .CLK(CLK),
+      .CLK(deb),
       .RESET(RESET),
       .BUS_DATA(bus_data),
       .BUS_ADDR(bus_addr),
       .BUS_WE(bus_we),
       .ROM_ADDRESS(rom_addr),
       .ROM_DATA(rom_data),
-      .BUS_INTERRUPTS_RAISE({bus_interrupts_raise[1], bus_interrupts_raise[0]}),
+      .BUS_INTERRUPTS_RAISE({1'b1, bus_interrupts_raise[0]}),
       .BUS_INTERRUPTS_ACK(bus_interrupts_ack),
 
       // Test
-      .state(processor_state)
+      .state(processor_state),
+      .regA (rega)
   );
   //////////////////////////////////////////////////////////////////////////////////
   RAM Corsair_Vengeance_Black_32GB_7000MHz_DDR5 (
@@ -90,15 +108,29 @@ module System (
       .BUS_INTERRUPT_ACK(bus_interrupts_ack[1])
   );
   //////////////////////////////////////////////////////////////////////////////////
+  wire [7:0] digits;
   SegSevDriverIO Samsung_odyssey_neo_g9 (
       .CLK(CLK),
+      .CLK2(CLK),
       .RESET(RESET),
       .BUS_DATA(bus_data),
       .BUS_ADDR(bus_addr),
       .BUS_WE(bus_we),
       .SEG_SELECT(SEG_SELECT),
-      .DEC_OUT(DEC_OUT)
+      .DEC_OUT(DEC_OUT),
+      .DIGIT(digits)
   );
+
+  //   Seg7Display S7 (
+  //       .IN_A(bus_addr[3:0]),
+  //       .IN_B(bus_addr[7:4]),
+  //       .IN_C(rega[3:0]),
+  //       .IN_D(rega[7:4]),
+  //       .CLK(CLK),
+  //       .SEG_SELECT(SEG_SELECT),
+  //       .DEC_OUT(DEC_OUT)
+  //   );
+
   //////////////////////////////////////////////////////////////////////////////////
   //   LEDIO rgb (
   //       .CLK(CLK),
@@ -109,7 +141,7 @@ module System (
   //       .LED_OUT(LED_OUT)
   //   );
 
-  assign LED_OUT = {x, y};
+  assign LED_OUT = {processor_state, digits};
 
   //////////////////////////////////////////////////////////////////////////////////
 
@@ -127,8 +159,10 @@ module System (
       .BUS_INTERRUPT_RAISE(bus_interrupts_raise[0]),
       .BUS_INTERRUPT_ACK(bus_interrupts_ack[0]),
       .X(x),
-      .Y(y)
+      .Y(y),
+      .SEND_INTERRUPT(interrupt)
   );
+
   //////////////////////////////////////////////////////////////////////////////////
   //   VGADriverIO to_mouni (
   //       .CLK(CLK),

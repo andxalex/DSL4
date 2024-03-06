@@ -255,6 +255,7 @@ module Processor (
       //The data will now have arrived from memory. Write it to the proper register.
       READ_FROM_MEM_2: begin
         NextState = CHOOSE_OPP;
+
         if (!CurrRegSelect) NextRegA = BusDataIn;
         else NextRegB = BusDataIn;
       end

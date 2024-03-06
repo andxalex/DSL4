@@ -19,7 +19,8 @@ module MouseDriverIO (
 
     // Additional
     output [7:0] X,
-    output [7:0] Y
+    output [7:0] Y,
+    output SEND_INTERRUPT
 );
 
   wire [5:0] status_mouse;
@@ -39,6 +40,9 @@ module MouseDriverIO (
   wire [4:0] x;
   wire [4:0] y;
   wire SendInterrupt;
+
+  assign SEND_INTERRUPT = SendInterrupt;
+
 
   // Instantiate mouse transceiver
   MouseTransceiver TR (

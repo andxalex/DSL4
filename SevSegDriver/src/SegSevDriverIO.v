@@ -2,6 +2,7 @@
 
 module SegSevDriverIO (
     input        CLK,
+    input        CLK2,
     input        RESET,
     //BUS
     inout  [7:0] BUS_DATA,
@@ -9,7 +10,9 @@ module SegSevDriverIO (
     input        BUS_WE,
     //OUT
     output [3:0] SEG_SELECT,
-    output [7:0] DEC_OUT
+    output [7:0] DEC_OUT,
+
+    output [7:0] DIGIT
 );
 
   // wires
@@ -49,12 +52,17 @@ module SegSevDriverIO (
 
   // dual port RAM (from the view of the processor)
   integer i;
-  always @(posedge CLK) begin
+  reg [7:0] test;
+  reg godhelpme;
+  always @(posedge CLK2) begin
     if (RESET) begin
       // If reset, re-init regbank to 0.
+      godhelpme <= 0;
+      test <= 8'hF0;
       DataBusOutWE <= 1'b0;
       for (i = 0; i < 6; i = i + 1) regBank[i] <= 8'h0;
     end else begin
+      godhelpme  <= 1;
       regBank[4] <= dec_out;
       regBank[5] <= {4'h0, seg_select};
       if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < BaseAddr + 6)) begin
@@ -63,14 +71,22 @@ module SegSevDriverIO (
           DataBusOutWE <= 1'b0;
           if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < BaseAddr + 4)) begin
             regBank[BUS_ADDR-BaseAddr] <= {4'h0, BufferedBusData[3:0]};
-          end
-        end else DataBusOutWE <= 1'b1;
-      end else DataBusOutWE <= 1'b0;
-
+            test <= 8'h01;
+          end else test <= 8'h02;
+        end else begin
+          DataBusOutWE <= 1'b1;
+          test <= 8'h03;
+        end
+      end else begin
+        DataBusOutWE <= 1'b0;
+        test <= 8'h04;
+      end
       DataBusOut <= regBank[BUS_ADDR-BaseAddr];
     end
   end
 
   assign SEG_SELECT = seg_select;
   assign DEC_OUT = dec_out;
+
+  assign DIGIT = {BUS_DATA[3:0], test[3:0]};
 endmodule
