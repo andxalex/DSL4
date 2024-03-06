@@ -60,7 +60,7 @@ module System (
       .BUS_WE(bus_we),
       .ROM_ADDRESS(rom_addr),
       .ROM_DATA(rom_data),
-      .BUS_INTERRUPTS_RAISE(2'b10),
+      .BUS_INTERRUPTS_RAISE({1'b0, bus_interrupts_raise[0]}),
       .BUS_INTERRUPTS_ACK(bus_interrupts_ack),
 
       // Test
@@ -80,15 +80,15 @@ module System (
       .BUS_ADDR(rom_addr)
   );
   //////////////////////////////////////////////////////////////////////////////////
-  //   Timer same_as_above (
-  //       .CLK(CLK),
-  //       .RESET(RESET),
-  //       .BUS_DATA(bus_data),
-  //       .BUS_ADDR(bus_addr),
-  //       .BUS_WE(bus_we),
-  //       .BUS_INTERRUPT_RAISE(bus_interrupts_raise[0]),
-  //       .BUS_INTERRUPT_ACK(bus_interrupts_ack[0])
-  //   );
+  Timer same_as_above (
+      .CLK(CLK),
+      .RESET(RESET),
+      .BUS_DATA(bus_data),
+      .BUS_ADDR(bus_addr),
+      .BUS_WE(bus_we),
+      .BUS_INTERRUPT_RAISE(bus_interrupts_raise[1]),
+      .BUS_INTERRUPT_ACK(bus_interrupts_ack[1])
+  );
   //////////////////////////////////////////////////////////////////////////////////
   SegSevDriverIO Samsung_odyssey_neo_g9 (
       .CLK(CLK),
@@ -100,16 +100,16 @@ module System (
       .DEC_OUT(DEC_OUT)
   );
   //////////////////////////////////////////////////////////////////////////////////
-  LEDIO rgb (
-      .CLK(CLK),
-      .RESET(RESET),
-      .BUS_DATA(bus_data),
-      .BUS_ADDR(bus_addr),
-      .BUS_WE(bus_we),
-      .LED_OUT(LED_OUT)
-  );
+  //   LEDIO rgb (
+  //       .CLK(CLK),
+  //       .RESET(RESET),
+  //       .BUS_DATA(bus_data),
+  //       .BUS_ADDR(bus_addr),
+  //       .BUS_WE(bus_we),
+  //       .LED_OUT(LED_OUT)
+  //   );
 
-  //   assign LED_OUT = {x, y};
+  assign LED_OUT = {x, y};
 
   //////////////////////////////////////////////////////////////////////////////////
 
@@ -124,8 +124,8 @@ module System (
       .BUS_WE(bus_we),
       .CLK_MOUSE(CLK_MOUSE),
       .DATA_MOUSE(DATA_MOUSE),
-      .BUS_INTERRUPT_RAISE(bus_interrupts_raise[1]),
-      .BUS_INTERRUPT_ACK(bus_interrupts_ack[1]),
+      .BUS_INTERRUPT_RAISE(bus_interrupts_raise[0]),
+      .BUS_INTERRUPT_ACK(bus_interrupts_ack[0]),
       .X(x),
       .Y(y)
   );
