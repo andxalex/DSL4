@@ -15,13 +15,21 @@ module MouseDriverIO (
     inout        DATA_MOUSE,
     // INTERRUPT
     output       BUS_INTERRUPT_RAISE,
-    input        BUS_INTERRUPT_ACK
+    input        BUS_INTERRUPT_ACK,
+
+    // Additional
+    output [7:0] X,
+    output [7:0] Y
 );
 
   wire [5:0] status_mouse;
   wire [7:0] x_mouse;
   wire [7:0] y_mouse;
   wire [2:0] z_mouse;
+
+  // Additional
+  assign X = x_mouse;
+  assign Y = regBank[3];
 
   // Additional wires
   wire [6:0] MSM_state;

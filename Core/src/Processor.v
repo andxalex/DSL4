@@ -13,7 +13,10 @@ module Processor (
     input  [7:0] ROM_DATA,
     // INTERRUPT signals
     input  [1:0] BUS_INTERRUPTS_RAISE,
-    output [1:0] BUS_INTERRUPTS_ACK
+    output [1:0] BUS_INTERRUPTS_ACK,
+
+    // Additional
+    output [7:0] state
 );
   //The main data bus is treated as tristate, so we need a mechanism to handle this.
   //Tristate signals that interface with the main state machine
@@ -100,8 +103,8 @@ module Processor (
   DO_MATHS_OPP_0 = 8'h32,  //wait for new op address to settle. end op.
   //In/Equality
   BRANCH_IF_A_EQUAL_B = 8'h33,  //
-  BRANCH_IF_A_LESS_THAN_B = 8'h34,  // 
-  BRANCH_IF_A_GREATER_THAN_B = 8'h35,  //
+  // BRANCH_IF_A_LESS_THAN_B = 8'h34,  // 
+  // BRANCH_IF_A_GREATER_THAN_B = 8'h35,  //
   BRANCH_IF_0 = 8'h36,  //
   BRANCH_IF_1 = 8'h37,  //wait for new op address to settle. end op.
   //GoTo
@@ -209,14 +212,12 @@ module Processor (
           4'h4: NextState = DO_MATHS_OPP_SAVE_IN_A;
           4'h5: NextState = DO_MATHS_OPP_SAVE_IN_B;
           4'h6: NextState = BRANCH_IF_A_EQUAL_B;
-          4'h7: NextState = BRANCH_IF_A_LESS_THAN_B;
-          4'h8: NextState = BRANCH_IF_A_GREATER_THAN_B;
-          4'h9: NextState = GOTO_ADDR;
-          4'hA: NextState = GOTO_IDLE;
-          4'hB: NextState = FUNC_CALL_ADDR;
-          4'hC: NextState = RETURN_FROM_FUNC;
-          4'hD: NextState = READ_ADDR_IN_A_SET_TO_A;
-          4'hE: NextState = READ_ADDR_IN_B_SET_TO_B;
+          4'h7: NextState = GOTO_ADDR;
+          4'h8: NextState = GOTO_IDLE;
+          4'h9: NextState = FUNC_CALL_ADDR;
+          4'hA: NextState = RETURN_FROM_FUNC;
+          4'hB: NextState = READ_ADDR_IN_A_SET_TO_A;
+          4'hC: NextState = READ_ADDR_IN_B_SET_TO_B;
           default: NextState = CurrState;
         endcase
         NextProgCounterOffset = 2'h1;
@@ -308,26 +309,8 @@ module Processor (
       // - Always pass through BRANCH_IF_1, to wait ROM output to settle before reading the
       //   next instruction.
 
-      // Check for branch if equal
+      // Check for branch if equal / less than / greater than
       BRANCH_IF_A_EQUAL_B: begin
-        if (AluOut) NextState = BRANCH_IF_0;
-        else begin
-          NextProgCounter = NextProgCounter + 2;
-          NextState = BRANCH_IF_1;
-        end
-      end
-
-      // Check for branch if less than
-      BRANCH_IF_A_LESS_THAN_B: begin
-        if (AluOut) NextState = BRANCH_IF_0;
-        else begin
-          NextProgCounter = NextProgCounter + 2;
-          NextState = BRANCH_IF_1;
-        end
-      end
-
-      // Check for branch if greater than
-      BRANCH_IF_A_GREATER_THAN_B: begin
         if (AluOut) NextState = BRANCH_IF_0;
         else begin
           NextProgCounter = NextProgCounter + 2;
@@ -458,4 +441,7 @@ module Processor (
       default: NextState = IDLE;
     endcase
   end
+
+  // Additional
+  assign state = CurrState;
 endmodule

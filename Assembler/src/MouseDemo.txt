@@ -12,3 +12,4 @@ alu sra
 alu sra
 alu sra
 sta 0xD1 \\ Write 4 MSB of Y to seg 1
+gti
