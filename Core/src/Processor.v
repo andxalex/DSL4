@@ -16,7 +16,8 @@ module Processor (
     output [1:0] BUS_INTERRUPTS_ACK,
 
     // Additional
-    output [7:0] state
+    output [7:0] state,
+    output [7:0] regA
 );
   //The main data bus is treated as tristate, so we need a mechanism to handle this.
   //Tristate signals that interface with the main state machine
@@ -63,6 +64,10 @@ module Processor (
       .ALU_Op_Code(ProgMemoryOut[7:4]),
       .OUT_RESULT(AluOut)
   );
+
+  // Remove this
+  assign regA = CurrRegA;
+
   //The microprocessor is essentially a state machine, with one sequential pipeline
   //of states for each operation.
   //The current list of operations is:
