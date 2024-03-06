@@ -60,7 +60,7 @@ module System (
       .BUS_WE(bus_we),
       .ROM_ADDRESS(rom_addr),
       .ROM_DATA(rom_data),
-      .BUS_INTERRUPTS_RAISE({1'b0, bus_interrupts_raise[0]}),
+      .BUS_INTERRUPTS_RAISE({bus_interrupts_raise[1], bus_interrupts_raise[0]}),
       .BUS_INTERRUPTS_ACK(bus_interrupts_ack),
 
       // Test
