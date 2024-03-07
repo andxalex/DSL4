@@ -110,6 +110,7 @@ def main():
     fout = open(f"{output_file}", "a+")
     for _ in range(num_lines,255-1):
         fout.write('0x0F' + '\n')
+    fout.write('0x00' + '\n')
     fout.write('0x00')
 
     # Close output file again

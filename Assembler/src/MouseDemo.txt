@@ -1,8 +1,8 @@
 lda 0xA3 \\ Load X
 sta 0xD2 \\ Write 4 lsb to seg 2
-alu sra  \\ Isolate 4 MSBs of X
-alu sra  
-alu sra  
+alu sra
+alu sra
+alu sra
 alu sra
 sta 0xD3 \\ Write 4 MSB of X to seg 3
 lda 0xA4 \\ Load Y 
