@@ -218,7 +218,7 @@ module Processor (
           4'h5: NextState = DO_MATHS_OPP_SAVE_IN_B;
           4'h6: NextState = BRANCH_IF_A_EQUAL_B;
           4'h7: NextState = GOTO_ADDR;
-          4'h8: NextState = GOTO_IDLE;
+          4'h8: NextState = IDLE;
           4'h9: NextState = FUNC_CALL_ADDR;
           4'hA: NextState = RETURN_FROM_FUNC;
           4'hB: NextState = READ_ADDR_IN_A_SET_TO_A;
