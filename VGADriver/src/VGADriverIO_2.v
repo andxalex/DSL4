@@ -24,20 +24,24 @@ module VGADriverIO_2 (
     input         CLK,
     input         RESET,
     //BUS
-    inout  [ 7:0] BUS_DATA,
-    input  [ 7:0] BUS_ADDR,
+    inout  [7:0] BUS_DATA,
+    input  [7:0] BUS_ADDR,
     input         BUS_WE,
 
   
     //Outputs to VGA
-    //output              A_DATA_OUT, Still have no clue why you would need this output
+    output              A_DATA_OUT,
     output              VGA_HS,
     output              VGA_VS,
     output     [7:0]    VGA_COLOUR
 
 );
 //////////////////////////////////////////////////////////////////////////////////
-// Register bank, holds device state
+// Register bank, holds device state.
+  //regBank[0] -> X
+  //regBank[1] -> Y
+  //regBank[2] -> input data
+  //regBank[3] -> write enable
   reg [7:0] regBank[3:0];
 
   // Tristate
@@ -71,9 +75,9 @@ reg        CONFIG_COLOURS = 16'b1110011110011111;
    // Instantiate Frame_Buffer and VGA_Sig_Gen modules
      Frame_Buffer frame_buffer (
        .A_CLK(CLK),
-       .A_ADDR(15'b100000010000000),
-       .A_DATA_IN(1'b1),
-       .A_WE(1'b1),
+       .A_ADDR({regBank[1][6:0],regBank[0]}),  //regBank[0], regBank[1] //LSBs are X and MSbs Y
+       .A_DATA_IN(regBank[2][0]),              //regBank[2]
+       .A_WE(regBank[3][0]),                   //regBank[3]
        .B_CLK(drp_clk),
        .B_ADDR(vga_addr),
        .A_DATA_OUT(A_DATA_OUT),
@@ -103,7 +107,7 @@ reg        CONFIG_COLOURS = 16'b1110011110011111;
       regBank[2]   <= 8'h0;
       regBank[3]   <= 8'h0;
     end else begin
-      if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < (BaseAddr + 5))) begin
+      if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < (BaseAddr + 4))) begin
         if (BUS_WE) begin
           DataBusOutWE <= 1'b0;
           regBank[BUS_ADDR-BaseAddr] <= BufferedBusData;

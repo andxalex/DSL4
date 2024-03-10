@@ -13,10 +13,10 @@ module System (
     // OUT
     output [15:0] LED_OUT,
     output [ 3:0] SEG_SELECT,
-    output [ 7:0] DEC_OUT
-    // output        VGA_HS,
-    // output        VGA_VS,
-    // output [ 7:0] VGA_COLOUR
+    output [ 7:0] DEC_OUT,
+    output        VGA_HS,
+    output        VGA_VS,
+    output [ 7:0] VGA_COLOUR
 );
 
   //////////////////////////////////////////////////////////////////////////////////
@@ -164,16 +164,16 @@ module System (
   );
 
   //////////////////////////////////////////////////////////////////////////////////
-  //   VGADriverIO to_mouni (
-  //       .CLK(CLK),
-  //       .RESET(RESET),
-  //       .ADDRESS(bus_addr),
-  //       .DATA(bus_data),
-  //       .BUS_WE(bus_we),
-  //       .VGA_HS(VGA_HS),
-  //       .VGA_VS(VGA_VS),
-  //       .VGA_COLOUR(VGA_COLOUR)
-  //   );
+    VGADriverIO_2 to_mouni (
+        .CLK(CLK),
+        .RESET(RESET),
+        .BUS_ADDR(bus_addr),
+        .BUS_DATA(bus_data),
+        .BUS_WE(bus_we),
+        .VGA_HS(VGA_HS),
+        .VGA_VS(VGA_VS),
+        .VGA_COLOUR(VGA_COLOUR)
+    );
 
   //////////////////////////////////////////////////////////////////////////////////
 
