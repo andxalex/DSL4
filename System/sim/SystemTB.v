@@ -29,15 +29,20 @@ module SystemTB(
     wire [7:0] regA;
     wire [7:0] regB;
     wire [7:0] instruction;
-    wire [3:0] D0;
-    wire [3:0] D1;
-    wire [3:0] D2;
-    wire [3:0] D3;
-    wire mouseInterrupt;
+    wire [3:0] B0;
+    wire [3:0] B1;
+    wire [3:0] B2;
+    wire [3:0] B3;
+    wire vgaInterrupt;
     wire [7:0] romAddr;
     wire [7:0] rawAddr;
     wire offset;
     wire [7:0] ROM [255:0];
+   // wire frame_buf_addres_1;
+   // wire frame_buf_addres_2;
+    wire  VGA_HS;
+    wire  VGA_VS;
+    wire     [7:0]    VGA_COLOUR;
     
     System dut (
            .CLK(CLK),
@@ -56,16 +61,22 @@ module SystemTB(
     assign regA = dut.ryzen_7800x3d.CurrRegA;
     assign regB = dut.ryzen_7800x3d.CurrRegB;
     assign instruction = dut.ryzen_7800x3d.ProgMemoryOut;
-    assign D0 = dut.Samsung_odyssey_neo_g9.regBank[0];
-    assign D1 = dut.Samsung_odyssey_neo_g9.regBank[1];
-    assign D2 = dut.Samsung_odyssey_neo_g9.regBank[2];
-    assign D3 = dut.Samsung_odyssey_neo_g9.regBank[3];
-    assign mouseInterrupt = dut.logitech_g1_pro.InterruptState;
+    assign B0 = dut.to_mouni.regBank[0];
+    assign B1 = dut.to_mouni.regBank[1];
+    assign B2 = dut.to_mouni.regBank[2];
+    assign B3 = dut.to_mouni.regBank[3];
+    assign vgaInterrupt = dut.ryzen_7800x3d.BUS_INTERRUPTS_RAISE[1];
     assign CpuState = dut.ryzen_7800x3d.CurrState;
     assign romAddr = dut.rom_addr;
     assign offset = dut.ryzen_7800x3d.CurrProgCounterOffset;
     assign rawAddr = dut.ryzen_7800x3d.CurrProgCounter;
-    
+   // assign frame_buf_addres_1 = dut.to_mouni.frame_buffer.Mem[0];
+   // assign frame_buf_addres_2 = dut.to_mouni.frame_buffer.Mem[1];
+    assign VGA_HS = dut.to_mouni.VGA_HS;
+    assign VGA_VS = dut.to_mouni.VGA_VS;
+    assign VGA_COLOUR = dut.to_mouni.VGA_COLOUR;
+
+
     genvar i;
     generate
         for (i = 0; i< 256; i = i + 1)begin
@@ -80,11 +91,10 @@ module SystemTB(
     
     initial begin
     RESET = 1;
-    #10000 RESET = 0;
+    #20 RESET = 0;
     
-    #10000 dut.logitech_g1_pro.InterruptState = 1;
-    #100   dut.logitech_g1_pro.InterruptState = 0;
-    #10000 $stop;
+
+    
     end
     
 endmodule

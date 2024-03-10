@@ -1,0 +1,14 @@
+lda 0x00 //Initialise reg A with zero
+ldb 0x00 //Initialise reg B with zero
+sta 0x02
+sta 0x03
+sta 0xB0 //X is zero
+stb 0xB1 //Y is zero
+lda 0x01 //Make a to fo to a to write enable
+sta 0xB2 //Write 1 value
+sta 0xB3 //Write enable
+sta 0xB3 //turn off write enable
+sta 0xB0 //X is zero
+stb 0xB1 //Y is zero
+stb 0xB2 //Write 1 value
+sta 0xB3 //Write enable
