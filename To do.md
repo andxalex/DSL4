@@ -1,9 +1,9 @@
-###To Do###
+# To Do
 
-Both:
+## Both:
 - Add immediate insruction. Think whether to make it bit specific or not.
 
-VGA:
+## VGA:
 - Reduce instructions by using dereference.
 
-Mouse:
+## Mouse:
