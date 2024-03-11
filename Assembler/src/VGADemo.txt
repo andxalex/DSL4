@@ -1,6 +1,6 @@
 lda 0x00 //Initialise reg A with zero
 ldb 0x00 //Initialise reg B with zero
-ldb 0x03 //LOOP
+ldb 0x03 //LOOP (04)
 sta 0x02 //Store adress of A
 stb 0x03 //Store adress of B
 sta 0xB0 //A for X
@@ -14,12 +14,12 @@ lda 0x02 //get old a adress back
 alu app //Increasae value of A
 sta 0x02 //Store A
 ldb 0x05 //B gets 256 to compare
-blt 0x02 //LOOP
+blt 0x04 //LOOP
 ldb 0x03 //get old adress of b
 blu bpp  //increase b
 stb 0x03 //store b
 lda 0x04 //load a with 127
-beq 0x18
+blt 0x2E //END
 lda 0x00
-gto 0x02 //LOOP
-gti //END
+gto 0x04 //LOOP
+gti //END (2F)
