@@ -235,7 +235,7 @@ module MouseTransceiver (
         if (accum_X > ((1 << MouseZ) - 1)) accum_X = 0;
         else accum_X = accum_X + 1;
       end
-    end
+    end 
 
     if (MouseDy != 0) begin
       if (((MouseDy >>> MouseZ) == 0) || ($signed(MouseDy >>> MouseZ) == -1)) begin

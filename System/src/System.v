@@ -30,10 +30,8 @@ module System (
   wire [1:0] bus_interrupts_ack;
 
   // additional
-  wire [7:0] processor_state;
   wire [7:0] x;
   wire [7:0] y;
-  wire [7:0] rega;
   wire interrupt;
 
   //////////////////////////////////////////////////////////////////////////////////
@@ -78,11 +76,7 @@ module System (
       .ROM_ADDRESS(rom_addr),
       .ROM_DATA(rom_data),
       .BUS_INTERRUPTS_RAISE({bus_interrupts_raise[1], bus_interrupts_raise[0]}),
-      .BUS_INTERRUPTS_ACK(bus_interrupts_ack),
-
-      // Test
-      .state(processor_state),
-      .regA (rega)
+      .BUS_INTERRUPTS_ACK(bus_interrupts_ack)
   );
   //////////////////////////////////////////////////////////////////////////////////
   RAM Corsair_Vengeance_Black_32GB_7000MHz_DDR5 (
@@ -106,7 +100,7 @@ module System (
       .BUS_WE(bus_we),
       .BUS_INTERRUPT_RAISE(bus_interrupts_raise[1]),
       .BUS_INTERRUPT_ACK(bus_interrupts_ack[1])
-  );
+  );  
   //////////////////////////////////////////////////////////////////////////////////
   SegSevDriverIO Samsung_odyssey_neo_g9 (
       .CLK(CLK),
@@ -119,31 +113,17 @@ module System (
       .DEC_OUT(DEC_OUT)
   );
 
-  //   Seg7Display S7 (
-  //       .IN_A(bus_addr[3:0]),
-  //       .IN_B(bus_addr[7:4]),
-  //       .IN_C(rega[3:0]),
-  //       .IN_D(rega[7:4]),
-  //       .CLK(CLK),
-  //       .SEG_SELECT(SEG_SELECT),
-  //       .DEC_OUT(DEC_OUT)
-  //   );
+  //////////////////////////////////////////////////////////////////////////////////
+    LEDIO rgb (
+        .CLK(CLK),
+        .RESET(RESET),
+        .BUS_DATA(bus_data),
+        .BUS_ADDR(bus_addr),
+        .BUS_WE(bus_we),
+        .LED_OUT(LED_OUT)
+    );
 
   //////////////////////////////////////////////////////////////////////////////////
-  //   LEDIO rgb (
-  //       .CLK(CLK),
-  //       .RESET(RESET),
-  //       .BUS_DATA(bus_data),
-  //       .BUS_ADDR(bus_addr),
-  //       .BUS_WE(bus_we),
-  //       .LED_OUT(LED_OUT)
-  //   );
-
-  assign LED_OUT = {processor_state, processor_state};
-
-  //////////////////////////////////////////////////////////////////////////////////
-
-
   MouseDriverIO logitech_g1_pro (
       .CLK(CLK),
       .RESET(RESET),

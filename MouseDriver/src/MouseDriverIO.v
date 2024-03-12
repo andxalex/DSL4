@@ -65,7 +65,7 @@ module MouseDriverIO (
       .ACCUM_X(x),
       .ACCUM_Y(y),
       .SEND_INTERRUPT(SendInterrupt)
-  );
+  );    
 
   ///////////////////////////////////////////////////////////////////////////////////////
   // Set Interrupt IO

@@ -85,7 +85,7 @@ def encode_with_immediate(op_code, alu_opcode, imm):
         "0x"
         + format(int(alu_opcodes[alu_opcode] + opcodes[op_code], 2), "02x")
         + "\n"
-        + format(int(imm), "02x")
+        + imm
     )
 
 

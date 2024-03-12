@@ -13,27 +13,23 @@ module ALU (
 );
   reg [7:0] Out;
   wire [3:0] ALU_Op_Code;
-  wire immA;
-  wire immB;
+  wire immA; 
+  wire immB; 
+  wire [7:0] argA;
+  wire [7:0] argB;
 
   assign ALU_Op_Code = INSTRUCT[7:4];
   assign immA = (INSTRUCT[3:0] == 4'hD) ? 1:0;
   assign immB = (INSTRUCT[3:0] == 4'hE) ? 1:0;
-
-  reg [7:0] argA;
-  reg [7:0] argB;
+  assign argA = immB? IMM : IN_A;
+  assign argB = immA? IMM : IN_B;
                    
   //Arithmetic Computation
   always @(posedge CLK) begin
     if (RESET) begin
        Out <= 0;
-       argA <= 8'h00;
-       argB <= 8'h00;
     end
     else begin
-
-      argA <= immB? IMM : IN_A;
-      argB <= immA? IMM : IN_B;
 
       case (ALU_Op_Code)
         //Maths Operations
@@ -45,12 +41,12 @@ module ALU (
         4'h2: Out <= argA * argB;
         //Shift Left A << 1
         4'h3: Out <= argA << (immA?argB:1);
-        //Shift Right A >> 1
+        //Shift Right A >> 1 
         4'h4: Out <= argA >> (immA?argB:1);
         //Increment A+1
         4'h5: Out <= IN_A + 1'b1;
         //Increment B+1
-        4'h6: Out <= IN_B + 1'b1;
+        4'h6: Out <= IN_B + 1'b1; 
         //Decrement A-1
         4'h7: Out <= IN_A - 1'b1;
         //Decrement B-1
@@ -70,10 +66,10 @@ module ALU (
         4'hE: Out <= argB << (immB?argA:1);
         //Shift Right B >> 1
         4'hF: Out <= argB >> (immB?argA:1);
-        //Default A
+        //Default A  
         default: Out <= IN_A;
       endcase
-    end
+    end 
   end
   assign OUT_RESULT = Out;
 endmodule
