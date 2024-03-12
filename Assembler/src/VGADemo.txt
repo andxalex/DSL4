@@ -1,25 +1,25 @@
+lda 0x01
+sta 0xB3
+sta 0xB2
 lda 0x00 //Initialise reg A with zero
 ldb 0x00 //Initialise reg B with zero
-ldb 0x03 //LOOP (04)
+sta 0x02
+stb 0x03
+sta 0xB0 //A for X (Write first 00)
+stb 0xB1 //B for Y
+ldb 0x03 //LOOP (12)
 sta 0x02 //Store adress of A
 stb 0x03 //Store adress of B
 sta 0xB0 //A for X
 stb 0xB1 //B for Y
-lda 0x01 //Make a 1 for colour
-sta 0xB2 //Write 1 value
-sta 0xB3 //Write enable
-lda 0x00 //a back to 0 to turn off write
-sta 0xB3 //turn off write enable
-lda 0x02 //get old a adress back
-alu app //Increasae value of A
-sta 0x02 //Store A
-ldb 0x05 //B gets 256 to compare
-blt 0x04 //LOOP
+alu app //Increase value of A
+ldb 0x00 //B gets 256 to compare
+bgt 0x12 //LOOP
 ldb 0x03 //get old adress of b
 blu bpp  //increase b
 stb 0x03 //store b
-lda 0x04 //load a with 127
-blt 0x2E //END
+lda 0x00 //load a with 127
+bgt 0x2F //END
 lda 0x00
-gto 0x04 //LOOP
-gti //END (2F)
+gto 0x12 //LOOP
+gti //END (3C)
