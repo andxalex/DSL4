@@ -18,14 +18,14 @@ module SegSevDriverIO (
   wire [3:0] seg_select;
 
   // Register bank, holds device input state
-  reg [7:0] regBank[1:0];
+  reg [7:0] regBank[2:0];
 
   //Instantiate 7 seg display
   Seg7Display S7 (
-      .IN_A(regBank[0][3:0]),
-      .IN_B(regBank[0][7:4]),
-      .IN_C(regBank[1][3:0]),
-      .IN_D(regBank[1][7:4]),
+      .IN_A({regBank[2][0],regBank[0][3:0]}),
+      .IN_B({regBank[2][1],regBank[0][7:4]}),
+      .IN_C({regBank[2][2],regBank[1][3:0]}),
+      .IN_D({regBank[2][3],regBank[1][7:4]}),
       .CLK(CLK),
       .SEG_SELECT(seg_select),
       .DEC_OUT(dec_out)
@@ -52,9 +52,9 @@ module SegSevDriverIO (
     if (RESET) begin
       // If reset, re-init regbank to 0.
       DataBusOutWE <= 1'b0;
-      for (i = 0; i < 2; i = i + 1) regBank[i] <= 8'h0;
+      for (i = 0; i < 3; i = i + 1) regBank[i] <= 8'h0;
     end else begin
-      if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < BaseAddr + 2)) begin
+      if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < BaseAddr + 3)) begin
         if (BUS_WE) begin
           DataBusOutWE <= 1'b0;
           regBank[BUS_ADDR-BaseAddr] <= BufferedBusData;

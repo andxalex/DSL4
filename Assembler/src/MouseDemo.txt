@@ -2,4 +2,6 @@ lda 0xA3 \\ Load X
 sta 0xD1 \\ Write to Seg2/3
 lda 0xA4 \\ Load Y 
 sta 0xD0 \\ Write to Seg0/1
+lda 0xA5 \\ Load Z
+sta 0xD2 \\ Write to dots
 gti
