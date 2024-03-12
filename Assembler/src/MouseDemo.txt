@@ -1,15 +1,5 @@
 lda 0xA3 \\ Load X
-sta 0xD2 \\ Write 4 lsb to seg 2
-alu sra
-alu sra
-alu sra
-alu sra
-sta 0xD3 \\ Write 4 MSB of X to seg 3
+sta 0xD1 \\ Write to Seg2/3
 lda 0xA4 \\ Load Y 
-sta 0xD0 \\ Write 4 lsb to seg 0
-alu sra
-alu sra
-alu sra
-alu sra
-sta 0xD1 \\ Write 4 MSB of Y to seg 1
+sta 0xD0 \\ Write to Seg0/1
 gti

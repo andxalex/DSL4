@@ -108,7 +108,6 @@ module System (
       .BUS_INTERRUPT_ACK(bus_interrupts_ack[1])
   );
   //////////////////////////////////////////////////////////////////////////////////
-  wire [7:0] digits;
   SegSevDriverIO Samsung_odyssey_neo_g9 (
       .CLK(CLK),
       .CLK2(CLK),
@@ -117,8 +116,7 @@ module System (
       .BUS_ADDR(bus_addr),
       .BUS_WE(bus_we),
       .SEG_SELECT(SEG_SELECT),
-      .DEC_OUT(DEC_OUT),
-      .DIGIT(digits)
+      .DEC_OUT(DEC_OUT)
   );
 
   //   Seg7Display S7 (
@@ -141,7 +139,7 @@ module System (
   //       .LED_OUT(LED_OUT)
   //   );
 
-  assign LED_OUT = {processor_state, digits};
+  assign LED_OUT = {processor_state, processor_state};
 
   //////////////////////////////////////////////////////////////////////////////////
 
