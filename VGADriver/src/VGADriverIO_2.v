@@ -78,7 +78,7 @@ wire     [15:0]   CONFIG_COLOURS;
        .A_CLK(CLK),
        .A_ADDR({regBank[1][6:0],regBank[0]}),  //regBank[0], regBank[1] //LSBs are X and MSbs Y
        .A_DATA_IN(regBank[0][0] | ~regBank[1][0]),              //chnages for every x
-       .A_WE(regBank[3][0]),                   //regBank[3]
+       .A_WE(regBank[1][7]),                   //regBank[3]
        .B_CLK(drp_clk),
        .B_ADDR(vga_addr),
        .A_DATA_OUT(A_DATA_OUT),
