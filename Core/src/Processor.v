@@ -13,11 +13,7 @@ module Processor (
     input  [7:0] ROM_DATA,
     // INTERRUPT signals
     input  [1:0] BUS_INTERRUPTS_RAISE,
-    output [1:0] BUS_INTERRUPTS_ACK,
-
-    // Additional
-    output [7:0] state,
-    output [7:0] regA
+    output [1:0] BUS_INTERRUPTS_ACK
 );
   //The main data bus is treated as tristate, so we need a mechanism to handle this.
   //Tristate signals that interface with the main state machine
@@ -35,6 +31,7 @@ module Processor (
   //the current program context when using function calls.
   reg [7:0] CurrRegA, NextRegA;
   reg [7:0] CurrRegB, NextRegB;
+  reg [7:0] CurrImm, NextImm;
   reg CurrRegSelect, NextRegSelect;
   reg [7:0] CurrProgContext, NextProgContext;
   //Dedicated Interrupt output lines - one for each interrupt line
@@ -61,12 +58,10 @@ module Processor (
       //I/O
       .IN_A(CurrRegA),
       .IN_B(CurrRegB),
-      .ALU_Op_Code(ProgMemoryOut[7:4]),
+      .IMM(CurrImm),
+      .INSTRUCT(ProgMemoryOut),
       .OUT_RESULT(AluOut)
   );
-
-  // Remove this
-  assign regA = CurrRegA;
 
   //The microprocessor is essentially a state machine, with one sequential pipeline
   //of states for each operation.
@@ -108,8 +103,6 @@ module Processor (
   DO_MATHS_OPP_0 = 8'h32,  //wait for new op address to settle. end op.
   //In/Equality
   BRANCH_IF_A_EQUAL_B = 8'h33,  //
-  // BRANCH_IF_A_LESS_THAN_B = 8'h34,  // 
-  // BRANCH_IF_A_GREATER_THAN_B = 8'h35,  //
   BRANCH_IF_0 = 8'h36,  //
   BRANCH_IF_1 = 8'h37,  //wait for new op address to settle. end op.
   //GoTo
@@ -129,7 +122,15 @@ module Processor (
   READ_ADDR_IN_A_SET_TO_A = 8'h49,  //
   READ_ADDR_IN_B_SET_TO_B = 8'h50,  // 
   READ_ADDR_IN_A_SET_TO_0 = 8'h51,  // 
-  READ_ADDR_IN_A_SET_TO_1 = 8'h52;  //
+  READ_ADDR_IN_A_SET_TO_1 = 8'h52,  //
+  //Immediate math
+  DO_MATHS_IMM_SAVE_IN_A = 8'h53,  //The result of maths op. is available, save it to Reg A.
+  DO_MATHS_IMM_SAVE_IN_B = 8'h54,  //The result of maths op. is available, save it to Reg B.
+  DO_MATHS_IMM_0 = 8'h55,  //wait for new op address to settle. end op.
+  DO_MATHS_IMM_1 = 8'h56,  //wait for new op address to settle. end op.
+  DO_MATHS_IMM_2 = 8'h57;
+  //Immediate load?
+
 
   //Sequential part of the State Machine.
   reg [7:0] CurrState, NextState;
@@ -143,6 +144,7 @@ module Processor (
       CurrBusDataOutWE <= 1'b0;
       CurrRegA <= 8'h00;
       CurrRegB <= 8'h00;
+      CurrImm <= 8'h00;
       CurrRegSelect <= 1'b0;
       CurrProgContext <= 8'h00;
       CurrInterruptAck <= 2'b00;
@@ -155,6 +157,7 @@ module Processor (
       CurrBusDataOutWE <= NextBusDataOutWE;
       CurrRegA <= NextRegA;
       CurrRegB <= NextRegB;
+      CurrImm <= NextImm;
       CurrRegSelect <= NextRegSelect;
       CurrProgContext <= NextProgContext;
       CurrInterruptAck <= NextInterruptAck;
@@ -171,6 +174,7 @@ module Processor (
     NextBusDataOutWE = 1'b0;
     NextRegA = CurrRegA;
     NextRegB = CurrRegB;
+    NextImm = CurrImm;
     NextRegSelect = CurrRegSelect;
     NextProgContext = CurrProgContext;
     NextInterruptAck = 2'b00;
@@ -223,6 +227,9 @@ module Processor (
           4'hA: NextState = RETURN_FROM_FUNC;
           4'hB: NextState = READ_ADDR_IN_A_SET_TO_A;
           4'hC: NextState = READ_ADDR_IN_B_SET_TO_B;
+          4'hD: NextState = DO_MATHS_IMM_SAVE_IN_A;
+          4'hE: NextState = DO_MATHS_IMM_SAVE_IN_B;
+          // 4'hF: NextState = 
           default: NextState = CurrState;
         endcase
         NextProgCounterOffset = 2'h1;
@@ -305,7 +312,43 @@ module Processor (
         NextProgCounter = CurrProgCounter + 1;
       end
       //Wait state for new prog address to settle.
-      DO_MATHS_OPP_0: NextState = CHOOSE_OPP;
+      DO_MATHS_OPP_0: begin
+        NextState = CHOOSE_OPP;
+      end
+
+      ///////////////////////////////////////////////////////////////////////////////////////
+      //DO_MATHS_IMM_SAVE_IN_A : here starts the DoMaths operational pipeline.
+      //Reg A and Reg B must already be set to the desired values. The MSBs of the
+      // Operation type determines the maths operation type. At this stage the result is
+      // ready to be collected from the ALU.
+      DO_MATHS_IMM_SAVE_IN_A: begin
+        NextState = DO_MATHS_IMM_0;
+        NextRegSelect = 1'b0;
+      end
+      //DO_MATHS_OPP_SAVE_IN_B : here starts the DoMaths operational pipeline
+      //when the result will go into reg B.
+      DO_MATHS_IMM_SAVE_IN_B: begin
+        NextState = DO_MATHS_IMM_0;
+        NextRegSelect = 1'b1;
+      end
+      //Wait state for new prog address to settle.
+      DO_MATHS_IMM_0: begin
+        NextState = DO_MATHS_IMM_1;
+        NextImm = ProgMemoryOut;
+      end
+      //Wait state - to give time for the mem data to be read
+      //Increment the program counter here. This must be done 2 clock cycles ahead
+      //so that it presents the right data when required.
+      DO_MATHS_IMM_1: begin
+        NextState = DO_MATHS_IMM_2;
+        NextProgCounter = CurrProgCounter + 2;
+      end  
+      //The data will now have arrived from memory. Write it to the proper register.
+      DO_MATHS_IMM_2: begin
+        NextState = CHOOSE_OPP;
+        if (!CurrRegSelect) NextRegA = AluOut;
+        else NextRegB = AluOut;
+      end
 
       ///////////////////////////////////////////////////////////////////////////////////////
       //BRANCH_IF_EQUAL: Branch pipeline:
@@ -447,7 +490,4 @@ module Processor (
       default: NextState = IDLE;
     endcase
   end
-
-  // Additional
-  assign state = CurrState;
 endmodule

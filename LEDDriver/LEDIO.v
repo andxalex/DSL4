@@ -32,12 +32,12 @@ module LEDIO (
 
   //Buffer 
   assign BufferedBusData = BUS_DATA;
-
+ 
   always @(posedge CLK) begin
 
     if (RESET) begin
       DataBusOutWE <= 1'b0;
-      regBank[0]   <= 8'h0;
+      regBank[0]   <= 8'h0; 
       regBank[1]   <= 8'h0;
     end else begin
       if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < (BaseAddr + 2))) begin

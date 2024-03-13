@@ -48,7 +48,7 @@ module Timer (
     else begin
       if (DownCounter == 32'd99999) DownCounter <= 0;
       else DownCounter <= DownCounter + 1'b1;
-    end
+    end 
   end
 
   //Now we can record the last time an interrupt was sent, and add a value to it to determine if it is

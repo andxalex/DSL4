@@ -44,18 +44,22 @@ opcodes = {
 
 # Define opcodes for ALU;
 alu_opcodes = {
-    "add": "00000",
-    "sub": "00001",
-    "mul": "00010",
-    "sla": "00011",
-    "sra": "00100",
-    "app": "00101",
-    "bpp": "00110",
-    "amm": "00111",
-    "bmm": "01000",
-    "equ": "01001",
-    "gte": "01010",
-    "lte": "01011",
+    "add": "0000",
+    "sub": "0001",
+    "mul": "0010",
+    "sla": "0011",
+    "sra": "0100",
+    "app": "0101",
+    "bpp": "0110",
+    "amm": "0111",
+    "bmm": "1000",
+    "equ": "1001",
+    "gte": "1010",
+    "lte": "1011",
+    "and": "1100",
+    "orr": "1101",
+    "slb": "1110",
+    "srb": "1111",
 }
 
 
@@ -81,7 +85,7 @@ def encode_with_immediate(op_code, alu_opcode, imm):
         "0x"
         + format(int(alu_opcodes[alu_opcode] + opcodes[op_code], 2), "02x")
         + "\n"
-        + format(int(imm), "02x")
+        + imm
     )
 
 
