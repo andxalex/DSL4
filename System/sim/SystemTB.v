@@ -29,10 +29,10 @@ module SystemTB(
     wire [7:0] regA;
     wire [7:0] regB;
     wire [7:0] instruction;
-    wire [3:0] B0;
-    wire [3:0] B1;
-    wire [3:0] B2;
-    wire [3:0] B3;
+    wire [7:0] B0;
+    wire [7:0] B1;
+    wire [7:0] B2;
+    wire [7:0] B3;
     wire vgaInterrupt;
     wire [7:0] romAddr;
     wire [7:0] rawAddr;
@@ -43,6 +43,8 @@ module SystemTB(
     wire  VGA_HS;
     wire  VGA_VS;
     wire     [7:0]    VGA_COLOUR;
+    wire [7:0] VGA_x;
+    wire [6:0] VGA_y;
     
     System dut (
            .CLK(CLK),
@@ -64,7 +66,7 @@ module SystemTB(
     assign B0 = dut.to_mouni.regBank[0];
     assign B1 = dut.to_mouni.regBank[1];
     assign B2 = dut.to_mouni.regBank[2];
-    assign B3 = dut.to_mouni.regBank[3];
+    assign Buffer_WE = dut.to_mouni.regBank[3][0];
     assign vgaInterrupt = dut.ryzen_7800x3d.BUS_INTERRUPTS_RAISE[1];
     assign CpuState = dut.ryzen_7800x3d.CurrState;
     assign romAddr = dut.rom_addr;
@@ -75,6 +77,8 @@ module SystemTB(
     assign VGA_HS = dut.to_mouni.VGA_HS;
     assign VGA_VS = dut.to_mouni.VGA_VS;
     assign VGA_COLOUR = dut.to_mouni.VGA_COLOUR;
+    assign VGA_x = dut.to_mouni.vga_addr[7:0];
+    assign VGA_y = dut.to_mouni.vga_addr[14:8];
 
 
     genvar i;
@@ -92,7 +96,7 @@ module SystemTB(
     initial begin
     RESET = 1;
     #20 RESET = 0;
-    
+    #10000000  $stop;
 
     
     end

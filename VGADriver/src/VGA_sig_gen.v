@@ -186,7 +186,7 @@ reg [15:0] col;
     end
 
     else begin
-        col <= 16'h000;
+        col <= 16'h0000;
         HCounter <= 0;
         VCounter <= 0;
     end
@@ -202,7 +202,7 @@ reg [7:0] final_col;
 always@(posedge CLK) begin 
 
     if(RESET)
-        final_col <= 8'h000;
+        final_col <= 8'h00;
    
     else    
 

@@ -67,7 +67,8 @@ wire       b_data;
 
 
 
-reg        CONFIG_COLOURS = 16'b1110011110011111;
+wire     [15:0]   CONFIG_COLOURS;
+
 
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -76,8 +77,9 @@ reg        CONFIG_COLOURS = 16'b1110011110011111;
      Frame_Buffer frame_buffer (
        .A_CLK(CLK),
        .A_ADDR({regBank[1][6:0],regBank[0]}),  //regBank[0], regBank[1] //LSBs are X and MSbs Y
-       .A_DATA_IN(regBank[2][0]),              //regBank[2]
-       .A_WE(regBank[3][0]),                   //regBank[3]
+       .A_DATA_IN(regBank[2][0]),
+       //.A_DATA_IN(regBank[0][0] | ~regBank[1][0]),              //chnages for every x
+       .A_WE(regBank[1][7]),                   //regBank[3]
        .B_CLK(drp_clk),
        .B_ADDR(vga_addr),
        .A_DATA_OUT(A_DATA_OUT),
@@ -120,7 +122,44 @@ reg        CONFIG_COLOURS = 16'b1110011110011111;
   end
 
 //////////////////////////////////////////////////////////////////////////////////
+//Part of the code that changes the colour every one second.
 
+wire               sec_wire;
+reg          [15:0] colour = 16'h000;
+
+//////////////////////////////////////////////////////////////////////////////////
+
+ //1 Second Counter 100000000
+ Generic_counter  # (.COUNTER_WIDTH(27),
+                .COUNTER_MAX(100000000)
+                )
+                General_Counter(
+                .CLK(CLK),
+                .RESET(1'b0),
+                .ENABLE(1'b1),
+                .TRIG_OUT(sec_wire)
+                );
+    
+//////////////////////////////////////////////////////////////////////////////////
+
+//Logic to change the output colour every one second.
+   
+always@(posedge CLK) begin
+
+    if(RESET)
+        colour <= CONFIG_COLOURS;
+    else
+        if(sec_wire)
+            colour <=  colour +10;
+        else
+           colour <=  colour; 
+end
+
+ //////////////////////////////////////////////////////////////////////////////////
+   
+ assign CONFIG_COLOURS = colour; 
+
+//////////////////////////////////////////////////////////////////////////////////
 
 endmodule
 
