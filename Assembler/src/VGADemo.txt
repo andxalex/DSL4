@@ -12,6 +12,14 @@ sta 0x02 //Store adress of A
 stb 0x03 //Store adress of B
 sta 0xB0 //A for X
 stb 0xB1 //B for Y
+lda 0x05
+alu sub //~B
+sta 0x06
+ldb 0x06
+lda 0x02
+alu orr
+sta 0xB2
+lda 0x02
 alu app //Increase value of A
 ldb 0x00 //B gets 256 to compare
 bgt 0x12 //LOOP
@@ -19,7 +27,7 @@ ldb 0x03 //get old adress of b
 blu bpp  //increase b
 stb 0x03 //store b
 lda 0x00 //load a with 127
-bgt 0x2F //END
+bgt 0x3D //END
 lda 0x00
 gto 0x12 //LOOP
 gti //END (3C)
