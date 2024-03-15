@@ -96,7 +96,7 @@ module SystemTB(
     initial begin
     RESET = 1;
     #20 RESET = 0;
-    #10000000  $stop;
+    
 
     
     end

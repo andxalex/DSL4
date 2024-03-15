@@ -2,7 +2,6 @@
 
 
 module System (
-    input         trigger,
     input         CLK,
     input         RESET,
     // CTRL
