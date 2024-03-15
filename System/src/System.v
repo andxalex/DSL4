@@ -8,6 +8,9 @@ module System (
     // CTRL
     input         BTN_L,
     input         BTN_R,
+    input         BTN_U,
+    input         BTN_D,
+    input  [15:0] SLIDE_S,
     // MOUSE
     inout         CLK_MOUSE,
     inout         DATA_MOUSE,
@@ -36,72 +39,44 @@ module System (
   wire interrupt;
 
   //////////////////////////////////////////////////////////////////////////////////
-  // Debounce buttons
-  reg BtnLDly, BtnRDly;
-  always @(posedge CLK) begin
-    BtnLDly <= BTN_L;
-    BtnRDly <= BTN_R;
-  end
-
-  // USE BELOW TO CONTROL PROCESSOR FLOW
-  // assign bus_interrupts_raise[1] = BTN_L;
-  // assign bus_interrupts_raise[0] = 1'b0;  //BTN_R;
-  reg [15:0] debounce_counter;
-  reg deb;
-  reg deb_last;  // To detect the transition and generate a single pulse
-
-  always @(posedge CLK) begin
-    if (BTN_R) begin
-      debounce_counter <= (debounce_counter == 16'hFFFF) ? 16'hFFFF : debounce_counter + 1;
-      // Generate a pulse when the counter transitions from 16'hFFFE to 16'hFFFF
-      if (debounce_counter == 16'hFFFE) begin
-        deb <= 1'b1;
-      end else if (deb != deb_last) begin
-        deb <= 1'b0;  // Ensure deb goes low after the pulse
-      end
-      deb_last <= deb;  // Update last debounced value
-    end else begin
-      debounce_counter <= 0;  // Reset counter when BTN_R is not pressed
-      deb <= 0;  // Ensure deb is low when BTN_R is not pressed
-      deb_last <= 0;  // Reset last debounced value
-    end
-  end
-
-
   Processor ryzen_7800x3d (
-      .CLK(CLK),
-      .RESET(RESET),
-      .BUS_DATA(bus_data),
-      .BUS_ADDR(bus_addr),
-      .BUS_WE(bus_we),
-      .ROM_ADDRESS(rom_addr),
-      .ROM_DATA(rom_data),
-      .BUS_INTERRUPTS_RAISE({bus_interrupts_raise[1], bus_interrupts_raise[0]}),
-      .BUS_INTERRUPTS_ACK(bus_interrupts_ack)
+    .CLK(CLK),
+    .RESET(RESET),
+    .BUS_DATA(bus_data),
+    .BUS_ADDR(bus_addr),
+    .BUS_WE(bus_we),
+    .ROM_ADDRESS(rom_addr),
+    .ROM_DATA(rom_data),
+    .BUS_INTERRUPTS_RAISE({bus_interrupts_raise[1], bus_interrupts_raise[0]}),
+    .BUS_INTERRUPTS_ACK(bus_interrupts_ack)
   );
+
   //////////////////////////////////////////////////////////////////////////////////
   RAM Corsair_Vengeance_Black_32GB_7000MHz_DDR5 (
-      .CLK(CLK),
-      .BUS_DATA(bus_data),
-      .BUS_ADDR(bus_addr),
-      .BUS_WE(bus_we)
+    .CLK(CLK),
+    .BUS_DATA(bus_data),
+    .BUS_ADDR(bus_addr),
+    .BUS_WE(bus_we)
   );
+
   //////////////////////////////////////////////////////////////////////////////////
   ROM theres_no_fancy_rom_stick (
-      .CLK(CLK),
-      .BUS_DATA(rom_data),
-      .BUS_ADDR(rom_addr)
+    .CLK(CLK),
+    .BUS_DATA(rom_data),
+    .BUS_ADDR(rom_addr)
   );
+
   //////////////////////////////////////////////////////////////////////////////////
   Timer same_as_above (
-      .CLK(CLK),
-      .RESET(RESET),
-      .BUS_DATA(bus_data),
-      .BUS_ADDR(bus_addr),
-      .BUS_WE(bus_we),
-      .BUS_INTERRUPT_RAISE(bus_interrupts_raise[1]),
-      .BUS_INTERRUPT_ACK(bus_interrupts_ack[1])
+    .CLK(CLK),
+    .RESET(RESET),
+    .BUS_DATA(bus_data),
+    .BUS_ADDR(bus_addr),
+    .BUS_WE(bus_we),
+    .BUS_INTERRUPT_RAISE(bus_interrupts_raise[1]),
+    .BUS_INTERRUPT_ACK(bus_interrupts_ack[1])
   );  
+
   //////////////////////////////////////////////////////////////////////////////////
   SegSevDriverIO Samsung_odyssey_neo_g9 (
       .CLK(CLK),
@@ -115,46 +90,63 @@ module System (
   );
 
   //////////////////////////////////////////////////////////////////////////////////
-    LEDIO rgb (
-        .CLK(CLK),
-        .RESET(RESET),
-        .BUS_DATA(bus_data),
-        .BUS_ADDR(bus_addr),
-        .BUS_WE(bus_we),
-        .LED_OUT(LED_OUT)
-    );
+  // LEDIO rgb (
+  //   .CLK(CLK),
+  //   .RESET(RESET),
+  //   .BUS_DATA(bus_data),
+  //   .BUS_ADDR(bus_addr),
+  //   .BUS_WE(bus_we),
+  //   .LED_OUT(LED_OUT)
+  // );
 
   //////////////////////////////////////////////////////////////////////////////////
   MouseDriverIO logitech_g1_pro (
-      .CLK(CLK),
-      .RESET(RESET),
-      .INC_SENS(BtnRDly & ~BTN_R),
-      .RED_SENS(BtnLDly & ~BTN_L),
-      .BUS_DATA(bus_data),
-      .BUS_ADDR(bus_addr),
-      .BUS_WE(bus_we),
-      .CLK_MOUSE(CLK_MOUSE),
-      .DATA_MOUSE(DATA_MOUSE),
-      .BUS_INTERRUPT_RAISE(bus_interrupts_raise[0]),
-      .BUS_INTERRUPT_ACK(bus_interrupts_ack[0]),
-      .X(x),
-      .Y(y),
-      .SEND_INTERRUPT(interrupt)
+    .CLK(CLK),
+    .RESET(RESET),
+    .INC_SENS(BtnRDly & ~BTN_R),
+    .RED_SENS(BtnLDly & ~BTN_L),
+    .BUS_DATA(bus_data),
+    .BUS_ADDR(bus_addr),
+    .BUS_WE(bus_we),
+    .CLK_MOUSE(CLK_MOUSE),
+    .DATA_MOUSE(DATA_MOUSE),
+    .BUS_INTERRUPT_RAISE(bus_interrupts_raise[0]),
+    .BUS_INTERRUPT_ACK(bus_interrupts_ack[0]),
+    .X(x),
+    .Y(y),
+    .SEND_INTERRUPT(interrupt)
   );
 
   //////////////////////////////////////////////////////////////////////////////////
-    VGADriverIO_2 to_mouni (
-        .CLK(CLK),
-        .RESET(RESET),
-        .BUS_ADDR(bus_addr),
-        .BUS_DATA(bus_data),
-        .BUS_WE(bus_we),
-        .VGA_HS(VGA_HS),
-        .VGA_VS(VGA_VS),
-        .VGA_COLOUR(VGA_COLOUR)
-    );
+  VGADriverIO_2 to_mouni (
+    .CLK(CLK),
+    .RESET(RESET),
+    .BUS_ADDR(bus_addr),
+    .BUS_DATA(bus_data),
+    .BUS_WE(bus_we),
+    .VGA_HS(VGA_HS),
+    .VGA_VS(VGA_VS),
+    .VGA_COLOUR(VGA_COLOUR)
+  );
 
   //////////////////////////////////////////////////////////////////////////////////
+  wire [15:0] test;
+  
+  IODriverIO magikeys (
+    .CLK(CLK),
+    .RESET(RESET),
+    .BTN_L(BTN_L),
+    .BTN_R(BTN_R),
+    .BTN_U(BTN_U),
+    .BTN_D(BTN_D),
+    .SLIDE_S(SLIDE_S),
+    .BUS_DATA(bus_data),
+    .BUS_ADDR(bus_addr),
+    .BUS_WE(bus_we),
+    .test(test)
+  );
 
+  assign LED_OUT = test;
 
+  //////////////////////////////////////////////////////////////////////////////////
 endmodule

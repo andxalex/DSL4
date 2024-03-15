@@ -1,24 +1,34 @@
-lda 0xA3        \\ Load X
-sta 0xD1        \\ Write to Seg2/3
-lda 0xA4        \\ Load Y 
-sta 0xD0        \\ Write to Seg0/1
-lda 0xA5        \\ Load Z
-sta 0xD2        \\ Write to dots
-lda 0xA6        \\ A = {1'b0, intellimouse, explorer, X accum}
-blu sla         \\ B = {intellimouse, explorer, X accum, 1'b0}
-alui sra 0x02   \\ A = {3'h0, intellimouse, explorer, X accum [4:2]}
-blui and 0xC0   \\ B = {intellimouse, explorer, 6'h0}
-alui and 0x07   \\ A = {6'h0, X accum [5:4]}
-blu orr         \\ B = {intellimouse, explorer, 3'h0, X accum [4:2]}
-lda 0xA7        \\ A = {1'b0, sensitivity, Y accum}
-alu sra         \\ A = {2'h0, sensitivity, Y accum[4:1]}
-alui and 0x30   \\ A = {2'h0, sensitivity, 4'h0}
-blu orr         \\ B = {intellimouse, explorer, sensitivity, 1'b0, X accum [4:2]}         
-stb 0xC1        \\ Write to left LED bank
-lda 0xA6        \\ A = {1'b0, intellimouse, explorer, X accum}
-alui sla 0x06   \\ A = {X accum [1:0], 6'h00}
-ldb 0xA7        \\ B = {1'b0, sensitivity, Y accum}
-blui and 0x1F   \\ B = {3'h0, Y accum}
-alu orr         \\ A = {X accum [1:0], 1'b0, Y accum}
-sta 0xC0        \\ Write to right LED bank
+lda 0xA3        # Load X
+sta 0xD1        # Write to Seg2/3
+lda 0xA4        # Load Y 
+sta 0xD0        # Write to Seg0/1
+lda 0xA5        # Load Z
+sta 0xD2        # Write to dots
+lda 0xA6        # A = {1'b0, intellimouse, explorer, X accum}
+blu sla         # B = {intellimouse, explorer, X accum, 1'b0}
+alui sra 0x02   # A = {3'h0, intellimouse, explorer, X accum [4:2]}
+blui and 0xC0   # B = {intellimouse, explorer, 6'h0}
+alui and 0x07   # A = {6'h0, X accum [5:4]}
+blu orr         # B = {intellimouse, explorer, 3'h0, X accum [4:2]}
+lda 0xA7        # A = {1'b0, sensitivity, Y accum}
+alu sra         # A = {2'h0, sensitivity, Y accum[4:1]}
+alui and 0x30   # A = {2'h0, sensitivity, 4'h0}
+blu orr         # B = {intellimouse, explorer, sensitivity, 1'b0, X accum [4:2]}         
+stb 0xC1        # Write to left LED bank
+lda 0xA6        # A = {1'b0, intellimouse, explorer, X accum}
+alui sla 0x06   # A = {X accum [1:0], 6'h00}
+ldb 0xA7        # B = {1'b0, sensitivity, Y accum}
+blui and 0x1F   # B = {3'h0, Y accum}
+alu orr         # A = {X accum [1:0], 1'b0, Y accum}
+sta 0xC0        # Write to right LED bank
+lda 0xE0        # A = {4'h0, btn_R, btn_L, btn_U, btn_D}
+alui and 0x0C   # A = {4'h0, btn_R, btn_L, 2'h0}
+sta 0x03        # store A to RAM
+ldb 0x03        # B = A. Need to model XOR behaviour
+alu orr         # A = A | B
+sta 0x04        # store OR result to RAM
+lda 0x03        # Load A again.
+blu and         # B = A & B
+lda 0x04        # A = A | B
+alu sub         # A = A | B - A & B = A XOR B
 gti

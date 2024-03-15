@@ -93,6 +93,10 @@ def encode_with_immediate(op_code, alu_opcode, imm):
 def parse_and_encode(instruction_line):
     # Split once for comments
     instruction = instruction_line.split("//", 1)[0]
+
+    # Split again for # comments
+    instruction = instruction_line.split("#", 1)[0]
+
     # Split further
     split_instruct = instruction.split(",")
     split_instruct = [a.split() for a in split_instruct][0]
