@@ -1,13 +1,10 @@
-lda 0x05
-sta 0xB1
-sta 0xB3
 lda 0x00 #Initialise reg A with zero
 ldb 0x00 #Initialise reg B with zero
 sta 0x02 
 stb 0x03
 sta 0xB0 #A for X (Write first 00)
 stb 0xB1 #B for Y
-ldb 0x03 #LOOP (12)
+ldb 0x03 #LOOP (0C)
 sta 0x02 #Store adress of A
 stb 0x03 #Store adress of B
 sta 0xB0 #A for X
@@ -19,13 +16,19 @@ sta 0xB2
 lda 0x02
 ldb 0x03
 alu app #Increase value of A
+sta 0x02 #Turn on and off WE
+lda 0x05
+sta 0xB1
+lda 0x00
+sta 0xB1
+lda 0x02
 ldb 0x00 #B gets 256 to compare
-bgt 0x12 #LOOP
+bgt 0x0C #LOOP
 ldb 0x03 #get old adress of b
 blu bpp  #increase b
 stb 0x03 #store b
 lda 0x00 #load a with 127
-bgt 0x3A #END
+bgt 0x40 #END
 lda 0x00
-gto 0x12 #LOOP
+gto 0x0C #LOOP
 gti #END (3C)
