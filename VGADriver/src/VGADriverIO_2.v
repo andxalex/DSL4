@@ -76,8 +76,8 @@ wire     [15:0]   CONFIG_COLOURS;
      Frame_Buffer frame_buffer (
        .A_CLK(CLK),
        .A_ADDR({regBank[1][6:0],regBank[0]}),  //regBank[0], regBank[1] //LSBs are X and MSbs Y
-       .A_DATA_IN(regBank[2][0]),
-       //.A_DATA_IN(regBank[0][0] | ~regBank[1][0]),              //chnages for every x
+       .A_DATA_IN(regBank[2][0]),             //chnages for every x
+       //.A_WE(1'b1), 
        .A_WE(regBank[1][7]),                   //regBank[3]
        .B_CLK(drp_clk),
        .B_ADDR(vga_addr),
@@ -106,7 +106,6 @@ wire     [15:0]   CONFIG_COLOURS;
       regBank[0]   <= 8'h0;
       regBank[1]   <= 8'h0;
       regBank[2]   <= 8'h0;
-      regBank[3]   <= 8'h0;
     end else begin
       if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < (BaseAddr + 4))) begin
         if (BUS_WE) begin

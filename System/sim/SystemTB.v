@@ -66,7 +66,7 @@ module SystemTB(
     assign B0 = dut.to_mouni.regBank[0];
     assign B1 = dut.to_mouni.regBank[1];
     assign B2 = dut.to_mouni.regBank[2];
-    assign Buffer_WE = dut.to_mouni.regBank[3][0];
+    //assign Buffer_WE = dut.to_mouni.regBank[3][0];
     assign vgaInterrupt = dut.ryzen_7800x3d.BUS_INTERRUPTS_RAISE[1];
     assign CpuState = dut.ryzen_7800x3d.CurrState;
     assign romAddr = dut.rom_addr;
