@@ -19,7 +19,7 @@ module Procecessor_TB;
     wire [1:0] BUS_INTERRUPTS_ACK;
 
     //Inside register
-    reg [7:0]inout_drive;  // locally driven value
+    reg [7:0]inout_drive = 8'd0;  // locally driven value
 
 
     assign BUS_DATA = inout_drive;
@@ -27,6 +27,7 @@ module Procecessor_TB;
     reg [7:0] state;
     reg [7:0] expected_state;
     reg flag;
+    reg fnished = 0;
 
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -46,12 +47,6 @@ module Procecessor_TB;
 //////////////////////////////////////////////////////////////////////////////////
 
     // Check for correct state
-    always @(posedge CLK) begin
-        if (state != expected_state) begin
-            flag = 1;
-        end
-    end
-
 
    // Clock Definition
     initial begin
@@ -59,21 +54,157 @@ module Procecessor_TB;
         forever #1 CLK = ~CLK;
     end 
 
-
+    reg [10:0] edge_counter = 11'b00000000000;
  
     always @(posedge CLK) begin
         state <= dut.CurrState;
-        $display("State: %h", state);
+        edge_counter <= edge_counter + 1;
+        if(edge_counter == 9 || (edge_counter == 4 && fnished))  edge_counter <= 0;
+
+        end
+//////////////////////////////////////////////////////////////////////////////////
+
+always @(negedge CLK) begin
+
+    case(ROM_DATA)
+
+        8'h10: begin    //READ_FROM_MEM_TO_A 
+
+            if(edge_counter == 3) begin
+
+                if(state != 8'h00) flag = 1;
+
+                if(BUS_ADDR != 8'hff) flag = 1;
+
+                if(ROM_ADDRESS != 8'h01) flag = 1;
+            end
+
+            if(edge_counter == 4) begin
+
+                if(state != 8'h00) flag = 1;
+
+                if(BUS_ADDR != 8'hff) flag = 1;
+
+                if(ROM_ADDRESS != 8'h01) flag = 1;
+            end
+
+            if(edge_counter == 5) begin
+
+                if(state != 8'h10) flag = 1;
+
+                if(BUS_ADDR != 8'hff) flag = 1;
+
+                if(ROM_ADDRESS != 8'h00) flag = 1;
+            end
+
+            if(edge_counter == 6) begin
+
+                if(state != 8'h12) flag = 1;
+
+                if(BUS_ADDR != 8'h10) flag = 1;
+
+                if(ROM_ADDRESS != 8'h00) flag = 1;
+            end
+
+            if(edge_counter == 7) begin
+
+                if(state != 8'h13) flag = 1;
+
+                if(BUS_ADDR != 8'hff) flag = 1;
+
+                if(ROM_ADDRESS != 8'h02) flag = 1;
+            end
+
+            if(edge_counter == 8) begin
+
+                ROM_DATA = 8'h11;
+                if(state != 8'h14) flag = 1;
+
+                if(BUS_ADDR != 8'hff) flag = 1;
+
+                if(ROM_ADDRESS != 8'h02) flag = 1;
+            end
+
+            if(edge_counter == 9) begin
+                
+                if(state != 8'h00) flag = 1;
+
+                if(BUS_ADDR != 8'hff) flag = 1;
+
+                if(ROM_ADDRESS != 8'h03) flag = 1;
+      
+
+            end
         end
 
-//////////////////////////////////////////////////////////////////////////////////
+        8'h11: begin
+
+            if(edge_counter == 0) begin
+
+                if(state != 8'h11) flag = 1;
+
+                if(BUS_ADDR != 8'hff) flag = 1;
+
+                if(ROM_ADDRESS != 8'h02) flag = 1;
+            end
+
+            if(edge_counter == 1) begin
+
+                if(state != 8'h12) flag = 1;
+
+                if(BUS_ADDR != 8'h11) flag = 1;
+
+                if(ROM_ADDRESS != 8'h02) flag = 1;
+            end
+
+            if(edge_counter == 2) begin
+
+                if(state != 8'h13) flag = 1;
+
+                if(BUS_ADDR != 8'hff) flag = 1;
+
+                if(ROM_ADDRESS != 8'h04) flag = 1;
+            end
+
+            if(edge_counter == 3) begin
+
+                ROM_DATA = 8'h20;           //next instruction
+
+                if(state != 8'h14) flag = 1;
+
+                if(BUS_ADDR != 8'hff) flag = 1;
+
+                if(ROM_ADDRESS != 8'h04) flag = 1;
+            end
+
+            if(edge_counter == 4) begin
+                 
+                if(state != 8'h00) flag = 1;
+
+                if(BUS_ADDR != 8'hff) flag = 1;
+
+                if(ROM_ADDRESS != 8'h05) flag = 1;
+
+                fnished = 1;
+                inout_drive = 8'h01;
+      
+            end
+            
+        end
+
+
+    endcase
+end
+
+
+// //////////////////////////////////////////////////////////////////////////////////
 
     // Initial stimulus
     initial begin
         // Initialize signals
         CLK = 0;
         RESET = 1;
-        inout_drive = 8'h00;
+        BUS_INTERRUPTS_RAISE = 2'b00;
         flag = 0;
 
         // Reset
@@ -83,14 +214,10 @@ module Procecessor_TB;
         ////////////////////////////////////////////////////////////////////////
 
         ROM_DATA = 8'h10;
-        BUS_INTERRUPTS_RAISE = 2'b00;
-        inout_drive = 8'h00;
-        #2 expected_state = 8'h00;
-        #2 expected_state = 8'h10;
-        #2 expected_state = 8'h12;
-        #2 expected_state = 8'h13;
-        #2 expected_state = 8'h14;
-        #2 $stop;
+   
+        
+
+        #90 $stop;
 
 
 
