@@ -41,12 +41,12 @@ module Timer (
     else if ((BUS_ADDR == TimerBaseAddr + 8'h03) & BUS_WE) InterruptEnable <= BUS_DATA[0];
   end
 
-  //First we must lower the clock speed from 100MHz to 1 KHz (1ms period)
+  //First we must lower the clock speed from 100MHz to 1 KHz (1ms period) d99999
   reg [31:0] DownCounter;
   always @(posedge CLK) begin
     if (RESET) DownCounter <= 0;
     else begin
-      if (DownCounter == 32'd99999) DownCounter <= 0;
+      if (DownCounter == 32'd9) DownCounter <= 0;
       else DownCounter <= DownCounter + 1'b1;
     end 
   end

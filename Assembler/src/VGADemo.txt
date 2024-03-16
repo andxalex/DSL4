@@ -1,10 +1,24 @@
+lda 0x06 #Load with interrupt counter
+ldb 0x00
+bgt 0x10 #(start_1)
+lda 0x00
+alui orr 0x02
+sta 0xB2
+alui and 0xFD
+sta 0xB2
+alu app #start_1
+sta 0x06
+ldb 0x07
+blt 0x1B #START_2
+lda 0x00
+sta 0x06
 lda 0x00 #Initialise reg A with zero
 ldb 0x00 #Initialise reg B with zero
 sta 0x02 
 stb 0x03
 sta 0xB0 #A for X (Write first 00)
 stb 0xB1 #B for Y
-ldb 0x03 #LOOP (0C)
+ldb 0x03 #LOOP (27)
 sta 0x02 #Store adress of A
 stb 0x03 #Store adress of B
 sta 0xB0 #A for X
@@ -24,12 +38,12 @@ stb 0xB1
 ldb 0x02
 lda 0x02
 ldb 0x00 #B gets 256 to compare
-bgt 0x0C #LOOP
+bgt 0x27 #LOOP
 ldb 0x03 #get old adress of b
 blu bpp  #increase b
 stb 0x03 #store b
 lda 0x08 #load a with 127
-beq 0x41 #END
+beq 0x5C #END
 lda 0x00
-gto 0x0C #LOOP
+gto 0x27 #LOOP
 gti #END (3C)
