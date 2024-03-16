@@ -28,8 +28,8 @@ bgt 0x0C #LOOP
 ldb 0x03 #get old adress of b
 blu bpp  #increase b
 stb 0x03 #store b
-lda 0x00 #load a with 127
-bgt 0x42 #END
+lda 0x08 #load a with 127
+beq 0x41 #END
 lda 0x00
 gto 0x0C #LOOP
 gti #END (3C)

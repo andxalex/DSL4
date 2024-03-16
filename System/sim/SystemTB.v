@@ -45,6 +45,8 @@ module SystemTB(
     wire     [7:0]    VGA_COLOUR;
     wire [7:0] VGA_x;
     wire [6:0] VGA_y;
+    wire [7:0] buffer_x;
+    wire [6:0] buffer_y;
     
     System dut (
            .CLK(CLK),
@@ -77,6 +79,8 @@ module SystemTB(
     assign VGA_HS = dut.to_mouni.VGA_HS;
     assign VGA_VS = dut.to_mouni.VGA_VS;
     assign VGA_COLOUR = dut.to_mouni.VGA_COLOUR;
+    assign buffer_x = dut.to_mouni.frame_buffer.A_ADDR[7:0];
+    assign buffer_y = dut.to_mouni.frame_buffer.A_ADDR[14:8];
     assign VGA_x = dut.to_mouni.vga_addr[7:0];
     assign VGA_y = dut.to_mouni.vga_addr[14:8];
 
@@ -90,7 +94,7 @@ module SystemTB(
     
     initial begin
     CLK = 0;
-    forever #5 CLK = ~CLK;
+    forever #1 CLK = ~CLK;
     end
     
     initial begin

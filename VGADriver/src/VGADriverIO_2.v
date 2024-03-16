@@ -77,7 +77,6 @@ wire     [15:0]   CONFIG_COLOURS;
        .A_CLK(CLK),
        .A_ADDR({regBank[1][6:0],regBank[0]}),  //regBank[0], regBank[1] //LSBs are X and MSbs Y
        .A_DATA_IN(regBank[2][0]),             //chnages for every x
-       //.A_WE(1'b1), 
        .A_WE(regBank[1][7]),                   //regBank[3]
        .B_CLK(drp_clk),
        .B_ADDR(vga_addr),
@@ -141,13 +140,22 @@ reg          [15:0] colour = 16'h000;
 //////////////////////////////////////////////////////////////////////////////////
 
 //Logic to change the output colour every one second.
-   
+
+
+reg b;
+
+always@(posedge CLK) begin
+  b <= regBank[2][1];
+end
+
+
+
 always@(posedge CLK) begin
 
     if(RESET)
         colour <= CONFIG_COLOURS;
     else
-        if(sec_wire)
+        if(regBank[2][1] & ~b)
             colour <=  colour +10;
         else
            colour <=  colour; 
