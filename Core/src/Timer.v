@@ -46,7 +46,7 @@ module Timer (
   always @(posedge CLK) begin
     if (RESET) DownCounter <= 0;
     else begin
-      if (DownCounter == 32'd9) DownCounter <= 0;
+      if (DownCounter == 32'd99999) DownCounter <= 0;
       else DownCounter <= DownCounter + 1'b1;
     end 
   end
