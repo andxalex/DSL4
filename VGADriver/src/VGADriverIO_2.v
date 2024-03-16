@@ -20,7 +20,6 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module VGADriverIO_2 (
-
     input         CLK,
     input         RESET,
     //BUS
@@ -42,7 +41,7 @@ module VGADriverIO_2 (
   //regBank[1] -> Y
   //regBank[2] -> input data
   //regBank[3] -> write enable
-  reg [7:0] regBank[3:0];
+  reg [7:0] regBank[2:0];
 
   // Tristate
   wire [7:0] BufferedBusData;
@@ -77,8 +76,7 @@ wire     [15:0]   CONFIG_COLOURS;
      Frame_Buffer frame_buffer (
        .A_CLK(CLK),
        .A_ADDR({regBank[1][6:0],regBank[0]}),  //regBank[0], regBank[1] //LSBs are X and MSbs Y
-       .A_DATA_IN(regBank[2][0]),
-       //.A_DATA_IN(regBank[0][0] | ~regBank[1][0]),              //chnages for every x
+       .A_DATA_IN(regBank[2][0]),             //chnages for every x
        .A_WE(regBank[1][7]),                   //regBank[3]
        .B_CLK(drp_clk),
        .B_ADDR(vga_addr),
@@ -107,7 +105,6 @@ wire     [15:0]   CONFIG_COLOURS;
       regBank[0]   <= 8'h0;
       regBank[1]   <= 8'h0;
       regBank[2]   <= 8'h0;
-      regBank[3]   <= 8'h0;
     end else begin
       if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < (BaseAddr + 4))) begin
         if (BUS_WE) begin
@@ -143,13 +140,22 @@ reg          [15:0] colour = 16'h000;
 //////////////////////////////////////////////////////////////////////////////////
 
 //Logic to change the output colour every one second.
-   
+
+
+reg b;
+
+always@(posedge CLK) begin
+  b <= regBank[2][1];
+end
+
+
+
 always@(posedge CLK) begin
 
     if(RESET)
         colour <= CONFIG_COLOURS;
     else
-        if(sec_wire)
+        if(regBank[2][1] & ~b)
             colour <=  colour +10;
         else
            colour <=  colour; 
