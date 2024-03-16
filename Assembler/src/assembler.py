@@ -65,18 +65,20 @@ alu_opcodes = {
 
 # Function to encode instructions with no operands
 def encode_no_operand(instruction):
-    return "0x" + format(int(opcodes[instruction], 2), "02x")
+    return "0x" + format(int(opcodes[instruction], 2), "02x") + "\n"
 
 
 # Function to encode branch and jump instructions with address
 def encode_with_address(instruction, address):
     opcode = opcodes[instruction]
-    return "0x" + format(int(opcode, 2), "02x") + "\n" + address
+    return "0x" + format(int(opcode, 2), "02x") + "\n" + address + "\n"
 
 
 # Function to encode alu ops
 def encode_alu(op_code, alu_opcode):
-    return "0x" + format(int(alu_opcodes[alu_opcode] + opcodes[op_code], 2), "02x")
+    return (
+        "0x" + format(int(alu_opcodes[alu_opcode] + opcodes[op_code], 2), "02x") + "\n"
+    )
 
 
 # Function to encode immediate instructions (alu operations for now)
@@ -86,6 +88,7 @@ def encode_with_immediate(op_code, alu_opcode, imm):
         + format(int(alu_opcodes[alu_opcode] + opcodes[op_code], 2), "02x")
         + "\n"
         + imm
+        + "\n"
     )
 
 
@@ -96,6 +99,10 @@ def parse_and_encode(instruction_line):
 
     # Split again for # comments
     instruction = instruction_line.split("#", 1)[0]
+
+    # Return if line is empty
+    if instruction == "":
+        return None
 
     # Split further
     split_instruct = instruction.split(",")
@@ -133,7 +140,9 @@ def main():
 
     # Iterate and translate
     for line in fin.read().splitlines():
-        fout.write(parse_and_encode(line) + "\n")
+        encoded = parse_and_encode(line)
+        if encoded != None:
+            fout.write(encoded)
 
     # Close files
     fin.close()

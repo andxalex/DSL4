@@ -1,3 +1,6 @@
+
+#
+
 lda 0xA3        # Load X
 sta 0xD1        # Write to Seg2/3
 lda 0xA4        # Load Y 
@@ -30,5 +33,14 @@ sta 0x04        # store OR result to RAM
 lda 0x03        # Load A again.
 blu and         # B = A & B
 lda 0x04        # A = A | B
-alu sub         # A = A | B - A & B = A XOR B
+alu sub         # A = (A | B) - (A & B) = A XOR B 
+beq xxxx        # If equal, do nothing
+ldb 0x00        # B = 0
+lda 0xE0        # If inequal, write btn_R to inc sens, and btn_L to red sens. A = {4'h0, btn_R, btn_L, btn_U, btn_D}
+alui sra 0x02   # A = {6'h0, btn_R, btn_L}
+sta 0xA1        # Write btn_L to dec_sens
+stb 0xA1        # Immediately clear
+alui sra 0x01   # A = {7'h0, btn_R}
+sta 0xA2        # Write btn_R to inc_sens
+stb 0xA2        # Immediately clear
 gti
