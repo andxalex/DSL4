@@ -25,6 +25,7 @@ module MouseTransceiver (
     input CLK,
     input INC_SENS,
     input RED_SENS,
+    input [2:0] RESOLUTION,
 
     //IO - Mouse side
     inout CLK_MOUSE,
@@ -188,7 +189,7 @@ module MouseTransceiver (
   //bound to Scroll wheel)
   wire signed [8:0] NewDx;
   wire signed [8:0] NewDy;
-
+  
   //Simple sensitivity adjustment is easy. Maintaining 
   //a uniform resolution is not. This is because right 
   // shifting can truncate to 0, preventing displacement 
@@ -204,19 +205,19 @@ module MouseTransceiver (
   //    output -1 or 1 depending on the sign of displacement.
   assign NewDx = 
     (MouseDx == 0) ? 0 : 
-    (((MouseDx >>> MouseZ) == 0) || ((MouseDx >>> MouseZ) == -1)) ? 
-        ((accum_X == ((1 << MouseZ) - 1)) ? 
+    (((MouseDx >>> RESOLUTION) == 0) || ((MouseDx >>> RESOLUTION) == -1)) ? 
+        ((accum_X == ((1 << RESOLUTION) - 1)) ? 
             (MouseDx[8] ? -1 : 1) : 
             0) : 
-        (MouseDx >>> MouseZ);
+        (MouseDx >>> RESOLUTION);
 
   assign NewDy = 
     (MouseDy == 0) ? 0 : 
-    (((MouseDy >>> MouseZ) == 0) || ((MouseDy >>> MouseZ) == -1)) ? 
-        ((accum_Y == ((1 << MouseZ) - 1)) ? 
+    (((MouseDy >>> RESOLUTION) == 0) || ((MouseDy >>> RESOLUTION) == -1)) ? 
+        ((accum_Y == ((1 << RESOLUTION) - 1)) ? 
             (MouseDy[8] ? -1 : 1) : 
             0) : 
-        (MouseDy >>> MouseZ);
+        (MouseDy >>> RESOLUTION);
 
   assign MouseNewX = {1'b0, MouseX} + NewDx;
   assign MouseNewY = {1'b0, MouseY} + NewDy;
@@ -229,18 +230,27 @@ module MouseTransceiver (
   // resolution.
   assign ACCUM_X = accum_X;
   assign ACCUM_Y = accum_Y;
-  always @(posedge SendInterrupt) begin
-    if (MouseDx != 0) begin
-      if (((MouseDx >>> MouseZ) == 0) || ($signed(MouseDx >>> MouseZ) == -1)) begin
-        if (accum_X > ((1 << MouseZ) - 1)) accum_X = 0;
-        else accum_X = accum_X + 1;
-      end
-    end 
+  always @(posedge CLK) begin
+    if (RESET) begin
+      accum_X <= 0;
+      accum_Y <= 0;
+    end if (SendInterrupt) begin
+      if (MouseDx != 0) begin
+        if (((MouseDx >>> RESOLUTION) == 0) || ($signed(MouseDx >>> MouseZ) == -1)) begin
+          if (accum_X > ((1 << RESOLUTION) - 1)) accum_X <= 0;
+          else begin
+            accum_X <= accum_X + 1;
+          end
+        end
+      end 
 
-    if (MouseDy != 0) begin
-      if (((MouseDy >>> MouseZ) == 0) || ($signed(MouseDy >>> MouseZ) == -1)) begin
-        if (accum_Y > ((1 << MouseZ) - 1)) accum_Y = 0;
-        else accum_Y = accum_Y + 1;
+      if (MouseDy != 0) begin
+        if (((MouseDy >>> RESOLUTION) == 0) || ($signed(MouseDy >>> MouseZ) == -1)) begin
+          if (accum_Y > ((1 << RESOLUTION) - 1)) accum_Y <= 0;
+          else begin
+            accum_Y <= accum_Y + 1;
+          end
+        end
       end
     end
   end
