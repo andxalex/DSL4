@@ -54,8 +54,9 @@ module LEDIO_TB;
     busaddr = 8'h00;
     BUS_WE  = 0;
     // Validate output one cycle after writing
-    if (LEDOUT[7:0] != 8'h0F) $display("Error in right register bank, %m: LED_OUT[7:0] != 8'hF0");
-    else $display("Write to right register bank executed correctly");
+    if (LEDOUT[7:0] == 8'h0F) $display("Write to right register bank executed correctly");
+    else $display("Error in right register bank, %m: LED_OUT[7:0] != 8'h0F");
+    $display("  - Writing LEDS 0 to 7, expected: 0x%0h got: 0x%0h", 8'h0F, LEDOUT[7:0]);
     #1000
 
     // Write value to left register bank and validate
@@ -67,16 +68,18 @@ module LEDIO_TB;
     busaddr = 8'h00;
     BUS_WE  = 0;
     // Validate output one cycle after writing
-    if (LEDOUT[15:8] != 8'hF0) $display("Error in left register bank, %m: LED_OUT[7:0] != 8'hF0");
-    else $display("Write to left register bank executed correctly");
+    if (LEDOUT[15:8] == 8'hF0) $display("Write to left register bank executed correctly");
+    else $display("Error in left register bank, %m: LED_OUT[15:8] != 8'hF0");
+    $display("  - Writing LEDS 15 to 8, expected: 0x%0h got: 0x%0h", 8'hF0, LEDOUT[15:8]);
     #1000
 
     // VALIDATE READ
     // Read value from right register bank and validate
     busaddr = 8'hC0;
     #10  // Wait a single and verify
-    if (BUSDATA != 8'h0F) $display("Error in reading right register bank, %m: BUSDATA != 8'h0F");
-    else $display("Read from right register bank executed correctly");
+    if (BUSDATA == 8'h0F) $display("Read from right register bank executed correctly");
+    else $display("Error in reading right register bank, %m: BUSDATA != 8'h0F");
+    $display("  - Reading LEDS 7 to 0, expected 0x%0h got 0x%0h", 8'h0F, BUSDATA);
     // Lower after verifying
     busaddr = 8'h00;
     #1000;
@@ -84,8 +87,9 @@ module LEDIO_TB;
     // Read value from left register bank and validate
     busaddr = 8'hC1;
     #10  // Wait a single and verify
-    if (BUSDATA != 8'hF0) $display("Error in reading left register bank, %m: BUSDATA != 8'hF0");
-    else $display("Read from left register bank executed correctly");
+    if (BUSDATA == 8'hF0) $display("Read from left register bank executed correctly");
+    else $display("Error in reading left register bank, %m: BUSDATA != 8'hF0");
+    $display("  - Reading LEDS 15 to 8, expected 0x%0h got 0x%0h", 8'hF0, BUSDATA);
     // Lower after verifying
     busaddr = 8'h00;
     #1000;
