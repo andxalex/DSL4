@@ -32,54 +32,48 @@ module System (
   wire [1:0] bus_interrupts_raise;
   wire [1:0] bus_interrupts_ack;
 
-  // additional
-  wire [7:0] x;
-  wire [7:0] y;
-  wire interrupt;
-
   //////////////////////////////////////////////////////////////////////////////////
   Processor ryzen_7800x3d (
-    .CLK(CLK),
-    .RESET(RESET),
-    .BUS_DATA(bus_data),
-    .BUS_ADDR(bus_addr),
-    .BUS_WE(bus_we),
-    .ROM_ADDRESS(rom_addr),
-    .ROM_DATA(rom_data),
-    .BUS_INTERRUPTS_RAISE({bus_interrupts_raise[1], bus_interrupts_raise[0]}),
-    .BUS_INTERRUPTS_ACK(bus_interrupts_ack)
+      .CLK(CLK),
+      .RESET(RESET),
+      .BUS_DATA(bus_data),
+      .BUS_ADDR(bus_addr),
+      .BUS_WE(bus_we),
+      .ROM_ADDRESS(rom_addr),
+      .ROM_DATA(rom_data),
+      .BUS_INTERRUPTS_RAISE({bus_interrupts_raise[1], bus_interrupts_raise[0]}),
+      .BUS_INTERRUPTS_ACK(bus_interrupts_ack)
   );
 
   //////////////////////////////////////////////////////////////////////////////////
   RAM Corsair_Vengeance_Black_32GB_7000MHz_DDR5 (
-    .CLK(CLK),
-    .BUS_DATA(bus_data),
-    .BUS_ADDR(bus_addr),
-    .BUS_WE(bus_we)
+      .CLK(CLK),
+      .BUS_DATA(bus_data),
+      .BUS_ADDR(bus_addr),
+      .BUS_WE(bus_we)
   );
 
   //////////////////////////////////////////////////////////////////////////////////
   ROM theres_no_fancy_rom_stick (
-    .CLK(CLK),
-    .BUS_DATA(rom_data),
-    .BUS_ADDR(rom_addr)
+      .CLK(CLK),
+      .BUS_DATA(rom_data),
+      .BUS_ADDR(rom_addr)
   );
 
   //////////////////////////////////////////////////////////////////////////////////
   Timer same_as_above (
-    .CLK(CLK),
-    .RESET(RESET),
-    .BUS_DATA(bus_data),
-    .BUS_ADDR(bus_addr),
-    .BUS_WE(bus_we),
-    .BUS_INTERRUPT_RAISE(bus_interrupts_raise[1]),
-    .BUS_INTERRUPT_ACK(bus_interrupts_ack[1])
-  );  
+      .CLK(CLK),
+      .RESET(RESET),
+      .BUS_DATA(bus_data),
+      .BUS_ADDR(bus_addr),
+      .BUS_WE(bus_we),
+      .BUS_INTERRUPT_RAISE(bus_interrupts_raise[1]),
+      .BUS_INTERRUPT_ACK(bus_interrupts_ack[1])
+  );
 
   //////////////////////////////////////////////////////////////////////////////////
   SegSevDriverIO Samsung_odyssey_neo_g9 (
       .CLK(CLK),
-      .CLK2(CLK),
       .RESET(RESET),
       .BUS_DATA(bus_data),
       .BUS_ADDR(bus_addr),
@@ -89,63 +83,56 @@ module System (
   );
 
   //////////////////////////////////////////////////////////////////////////////////
-  // LEDIO rgb (
-  //   .CLK(CLK),
-  //   .RESET(RESET),
-  //   .BUS_DATA(bus_data),
-  //   .BUS_ADDR(bus_addr),
-  //   .BUS_WE(bus_we),
-  //   .LED_OUT(LED_OUT)
-  // );
+  // wire [15:0] led;
+  LEDIO rgb (
+      .CLK(CLK),
+      .RESET(RESET),
+      .BUS_DATA(bus_data),
+      .BUS_ADDR(bus_addr),
+      .BUS_WE(bus_we),
+      .LED_OUT(LED_OUT)
+  );
 
   //////////////////////////////////////////////////////////////////////////////////
   MouseDriverIO logitech_g1_pro (
-    .CLK(CLK),
-    .RESET(RESET),
-    .INC_SENS(BtnRDly & ~BTN_R),
-    .RED_SENS(BtnLDly & ~BTN_L),
-    .BUS_DATA(bus_data),
-    .BUS_ADDR(bus_addr),
-    .BUS_WE(bus_we),
-    .CLK_MOUSE(CLK_MOUSE),
-    .DATA_MOUSE(DATA_MOUSE),
-    .BUS_INTERRUPT_RAISE(bus_interrupts_raise[0]),
-    .BUS_INTERRUPT_ACK(bus_interrupts_ack[0]),
-    .X(x),
-    .Y(y),
-    .SEND_INTERRUPT(interrupt)
+      .CLK(CLK),
+      .RESET(RESET),
+      .BUS_DATA(bus_data),
+      .BUS_ADDR(bus_addr),
+      .BUS_WE(bus_we),
+      .CLK_MOUSE(CLK_MOUSE),
+      .DATA_MOUSE(DATA_MOUSE),
+      .BUS_INTERRUPT_RAISE(bus_interrupts_raise[0]),
+      .BUS_INTERRUPT_ACK(bus_interrupts_ack[0]),
+      .SEND_INTERRUPT(interrupt)
   );
 
   //////////////////////////////////////////////////////////////////////////////////
   VGADriverIO_2 to_mouni (
-    .CLK(CLK),
-    .RESET(RESET),
-    .BUS_ADDR(bus_addr),
-    .BUS_DATA(bus_data),
-    .BUS_WE(bus_we),
-    .VGA_HS(VGA_HS),
-    .VGA_VS(VGA_VS),
-    .VGA_COLOUR(VGA_COLOUR)
+      .CLK(CLK),
+      .RESET(RESET),
+      .BUS_ADDR(bus_addr),
+      .BUS_DATA(bus_data),
+      .BUS_WE(bus_we),
+      .VGA_HS(VGA_HS),
+      .VGA_VS(VGA_VS),
+      .VGA_COLOUR(VGA_COLOUR)
   );
 
   //////////////////////////////////////////////////////////////////////////////////
-  wire [15:0] test;
-  
-  IODriverIO magikeys (
-    .CLK(CLK),
-    .RESET(RESET),
-    .BTN_L(BTN_L),
-    .BTN_R(BTN_R),
-    .BTN_U(BTN_U),
-    .BTN_D(BTN_D),
-    .SLIDE_S(SLIDE_S),
-    .BUS_DATA(bus_data),
-    .BUS_ADDR(bus_addr),
-    .BUS_WE(bus_we),
-    .test(test)
-  );
 
-  assign LED_OUT = test;
+  IODriverIO magikeys (
+      .CLK(CLK),
+      .RESET(RESET),
+      .BTN_L(BTN_L),
+      .BTN_R(BTN_R),
+      .BTN_U(BTN_U),
+      .BTN_D(BTN_D),
+      .SLIDE_S(SLIDE_S),
+      .BUS_DATA(bus_data),
+      .BUS_ADDR(bus_addr),
+      .BUS_WE(bus_we)
+  );
 
   //////////////////////////////////////////////////////////////////////////////////
 endmodule
