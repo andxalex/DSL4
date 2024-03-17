@@ -1,46 +1,63 @@
-
-#
-
-lda 0xA3        # Load X
+# ************************************************************
+# ************* LOAD X/Y/Z to write to 7 segment *************
+# ************************************************************
+lda 0xA1        # Load X
 sta 0xD1        # Write to Seg2/3
-lda 0xA4        # Load Y 
+lda 0xA2        # Load Y 
 sta 0xD0        # Write to Seg0/1
-lda 0xA5        # Load Z
+lda 0xA3        # Load Z
 sta 0xD2        # Write to dots
-lda 0xA6        # A = {1'b0, intellimouse, explorer, X accum}
+
+# ************************************************************
+# ***************** Write to Z to resolution *****************
+# ************************************************************
+lda 0xA3        # A = {5'h0, Z}
+ldb 0xA6        # B = {inc_sens, dec_sens, 3'h0, resolution}
+blui and 0xC0   # B = {inc_sens, dec_sens, 6'h0}
+alu orr         # A = {inc_sens, dec_sens, 3'h0, Z}         
+sta 0xA6        
+
+# ************************************************************
+# ************* LOAD MOUSE STATE TO WRITE TO LEDS ************
+# ************************************************************
+# Starting with the left LED Bank:
+lda 0xA4        # A = {1'b0, intellimouse, explorer, X accum}
 blu sla         # B = {intellimouse, explorer, X accum, 1'b0}
 alui sra 0x02   # A = {3'h0, intellimouse, explorer, X accum [4:2]}
 blui and 0xC0   # B = {intellimouse, explorer, 6'h0}
 alui and 0x07   # A = {6'h0, X accum [5:4]}
 blu orr         # B = {intellimouse, explorer, 3'h0, X accum [4:2]}
-lda 0xA7        # A = {1'b0, sensitivity, Y accum}
+lda 0xA5        # A = {1'b0, sensitivity, Y accum}
 alu sra         # A = {2'h0, sensitivity, Y accum[4:1]}
 alui and 0x30   # A = {2'h0, sensitivity, 4'h0}
 blu orr         # B = {intellimouse, explorer, sensitivity, 1'b0, X accum [4:2]}         
 stb 0xC1        # Write to left LED bank
-lda 0xA6        # A = {1'b0, intellimouse, explorer, X accum}
+
+# Now the right LED Bank
+lda 0xA4        # A = {1'b0, intellimouse, explorer, X accum}
 alui sla 0x06   # A = {X accum [1:0], 6'h00}
-ldb 0xA7        # B = {1'b0, sensitivity, Y accum}
+ldb 0xA5        # B = {1'b0, sensitivity, Y accum}
 blui and 0x1F   # B = {3'h0, Y accum}
 alu orr         # A = {X accum [1:0], 1'b0, Y accum}
 sta 0xC0        # Write to right LED bank
+
+
+# ************************************************************
+# ******** LOAD BUTTON CONTROLS TO CHANGE SENSITIVITY ********
+# ************************************************************
+# Do nothing if both an increase and a decrease were scheduled.
 lda 0xE0        # A = {4'h0, btn_R, btn_L, btn_U, btn_D}
-alui and 0x0C   # A = {4'h0, btn_R, btn_L, 2'h0}
-sta 0x03        # store A to RAM
-ldb 0x03        # B = A. Need to model XOR behaviour
-alu orr         # A = A | B
-sta 0x04        # store OR result to RAM
-lda 0x03        # Load A again.
-blu and         # B = A & B
-lda 0x04        # A = A | B
-alu sub         # A = (A | B) - (A & B) = A XOR B 
-beq xxxx        # If equal, do nothing
-ldb 0x00        # B = 0
-lda 0xE0        # If inequal, write btn_R to inc sens, and btn_L to red sens. A = {4'h0, btn_R, btn_L, btn_U, btn_D}
-alui sra 0x02   # A = {6'h0, btn_R, btn_L}
-sta 0xA1        # Write btn_L to dec_sens
-stb 0xA1        # Immediately clear
-alui sra 0x01   # A = {7'h0, btn_R}
-sta 0xA2        # Write btn_R to inc_sens
-stb 0xA2        # Immediately clear
+ldb 0xE0        # B = {4'h0, btn_R, btn_L, btn_U, btn_D}
+alui and 0x08   # A = {4'h0, btn_R, 3'h0}
+alui sla 0x04   # A = {btn_R, 7'h0}
+blui and 0x04   # B = {5'h0, btn_L, 2'h0}
+blui slb 0x04   # B = {1'b0, btn_L, 6'h0}
+alu orr         # A = {btn_R, btn_L, 6'h0}
+ldb 0xA6        # B = {inc_sens, dec_sens, 3'h0, resolution}
+blui and 0x07   # B = {5'h0, resolution}
+alu orr         # B = {btn_R, btn_L, 3'h0, resolution}
+sta 0xA6        # Write to MouseDriver register
+stb 0xA6        # Drop the btn_R, btn_L flags
+ldb 0x00        # B = 0;
+stb 0xE0        # Acknowledge the sensitivity change.
 gti
