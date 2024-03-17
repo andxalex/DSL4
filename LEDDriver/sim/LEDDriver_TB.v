@@ -45,7 +45,6 @@ module LEDDriver_TB;
     #1000
 
     // VALIDATE WRITE
-
     // Write value to right register bank and validate
     busdata = 8'h0F;
     busaddr = 8'hC0;
