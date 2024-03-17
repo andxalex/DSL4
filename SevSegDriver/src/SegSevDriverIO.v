@@ -2,7 +2,6 @@
 
 module SegSevDriverIO (
     input        CLK,
-    input        CLK2,
     input        RESET,
     //BUS
     inout  [7:0] BUS_DATA,
@@ -22,10 +21,10 @@ module SegSevDriverIO (
 
   //Instantiate 7 seg display
   Seg7Display S7 (
-      .IN_A({regBank[2][0],regBank[0][3:0]}),
-      .IN_B({regBank[2][1],regBank[0][7:4]}),
-      .IN_C({regBank[2][2],regBank[1][3:0]}),
-      .IN_D({regBank[2][3],regBank[1][7:4]}),
+      .IN_A({regBank[2][0], regBank[0][3:0]}),
+      .IN_B({regBank[2][1], regBank[0][7:4]}),
+      .IN_C({regBank[2][2], regBank[1][3:0]}),
+      .IN_D({regBank[2][3], regBank[1][7:4]}),
       .CLK(CLK),
       .SEG_SELECT(seg_select),
       .DEC_OUT(dec_out)
@@ -48,7 +47,7 @@ module SegSevDriverIO (
 
   // dual port RAM (from the view of the processor)
   integer i;
-  always @(posedge CLK2) begin
+  always @(posedge CLK) begin
     if (RESET) begin
       // If reset, re-init regbank to 0.
       DataBusOutWE <= 1'b0;
