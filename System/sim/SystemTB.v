@@ -61,24 +61,24 @@ module SystemTB(
 //////////////////////////////////////////////////////////////////////////////////
 //Exposing registers of submodules
 
-    assign regA = dut.ryzen_7800x3d.CurrRegA;
-    assign regB = dut.ryzen_7800x3d.CurrRegB;
-    assign instruction = dut.ryzen_7800x3d.ProgMemoryOut;
-    assign B0 = dut.vga.regBank[0];
-    assign B1 = dut.vga.regBank[1];
-    assign B2 = dut.vga.regBank[2];
-    assign vgaInterrupt = dut.ryzen_7800x3d.BUS_INTERRUPTS_RAISE[1];
-    assign CpuState = dut.ryzen_7800x3d.CurrState;
-    assign romAddr = dut.rom_addr;
-    assign offset = dut.ryzen_7800x3d.CurrProgCounterOffset;
-    assign rawAddr = dut.ryzen_7800x3d.CurrProgCounter;
-    assign VGA_HS = dut.vga.VGA_HS;
-    assign VGA_VS = dut.vga.VGA_VS;
-    assign VGA_COLOUR = dut.vga.VGA_COLOUR;
-    assign buffer_x = dut.vga.frame_buffer.A_ADDR[7:0];
-    assign buffer_y = dut.vga.frame_buffer.A_ADDR[14:8];
-    assign VGA_x = dut.vga.vga_addr[7:0];
-    assign VGA_y = dut.vga.vga_addr[14:8];
+    assign regA         =       dut.ryzen_7800x3d.CurrRegA;
+    assign regB         =       dut.ryzen_7800x3d.CurrRegB;
+    assign instruction  =       dut.ryzen_7800x3d.ProgMemoryOut;
+    assign B0           =       dut.vga.regBank[0];
+    assign B1           =       dut.vga.regBank[1];
+    assign B2           =       dut.vga.regBank[2];
+    assign vgaInterrupt =       dut.ryzen_7800x3d.BUS_INTERRUPTS_RAISE[1];
+    assign CpuState     =       dut.ryzen_7800x3d.CurrState;
+    assign romAddr      =       dut.rom_addr;
+    assign offset       =       dut.ryzen_7800x3d.CurrProgCounterOffset;
+    assign rawAddr      =       dut.ryzen_7800x3d.CurrProgCounter;
+    assign VGA_HS       =       dut.vga.VGA_HS;
+    assign VGA_VS       =       dut.vga.VGA_VS;
+    assign VGA_COLOUR   =       dut.vga.VGA_COLOUR;
+    assign buffer_x     =       dut.vga.frame_buffer.A_ADDR[7:0];
+    assign buffer_y     =       dut.vga.frame_buffer.A_ADDR[14:8];
+    assign VGA_x        =       dut.vga.vga_addr[7:0];
+    assign VGA_y        =       dut.vga.vga_addr[14:8];
 //////////////////////////////////////////////////////////////////////////////////
 //See ROM content
     genvar i;
