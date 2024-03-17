@@ -1,17 +1,3 @@
-lda 0x06        #Load the interrupt counter
-ldb 0x00
-bgt 0x10        #Go to START_1
-lda 0x00        #Trigger to change colour
-alui orr 0x02   #Only bit operations
-sta 0xB2
-alui and 0xFD
-sta 0xB2
-alu app         #START_1, Increase interrupt counter
-sta 0x06
-ldb 0x07
-blt 0x1B        #Go to START_2, check if the 1 second limit is reached
-lda 0x00
-sta 0x06
 lda 0x00        #START_2, Initialise reg A with zero
 ldb 0x00        #Initialise reg B with zero    
 sta 0x02        #Store adress of A
@@ -23,6 +9,15 @@ sta 0x02        #Store adress of A
 stb 0x03        #Store adress of B
 sta 0xB0        #A for X
 stb 0xB1        #B for Y
+
+alui srb 0x05
+alui add 0x04
+kati 
+
+
+
+
+
 alui and 0x01
 blui and 0x01
 alu and

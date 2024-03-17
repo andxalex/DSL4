@@ -1,27 +1,35 @@
 `timescale 1ns / 1ps
+/*
+This is a test bench for the VGA periphreal. It was four different tests of different
+comlexities. Each test examines seperate parts of the VGA and then the final one
+tests the whole functionality by writting values on different parts of the frame
+buffer.
+
+INSTRUCTIONS FOR THE USER: If the user want to run the test, they better comment
+out the rest of the tests, and run each test seperately. 
+*/
 //////////////////////////////////////////////////////////////////////////////////
 module VGADriverIO_2_tb;
+//////////////////////////////////////////////////////////////////////////////////
+//Register and wire definition
 
-    
     // Signals
     //Inputs
-    reg CLK;
-    reg RESET;
-    wire [7:0] BUS_DATA;
-    reg [7:0] BUS_ADDR;
-    reg BUS_WE;
+    reg                 CLK;
+    reg                 RESET;
+    wire    [7:0]       BUS_DATA;
+    reg     [7:0]       BUS_ADDR;
+    reg                 BUS_WE;
     //Outputs
-    wire A_DATA_OUT;
-    wire VGA_HS;
-    wire VGA_VS;
-    wire [7:0] VGA_COLOUR;
+    wire                A_DATA_OUT;
+    wire                VGA_HS;
+    wire                VGA_VS;
+    wire    [7:0]       VGA_COLOUR;
 
     //Inside register
-    reg [7:0]inout_drive;  // locally driven value
-    wire [7:0]inout_recv;
-
+    reg     [7:0]       inout_drive;  // locally driven value
     assign BUS_DATA = inout_drive;
-    assign inout_recv = BUS_DATA; 
+
 //////////////////////////////////////////////////////////////////////////////////
 
     // Instantiate the VGADriverIO_2 module
@@ -44,7 +52,6 @@ module VGADriverIO_2_tb;
         forever #1 CLK = ~CLK;
     end 
 
-    
 //////////////////////////////////////////////////////////////////////////////////
 
     // Initial stimulus
@@ -79,8 +86,8 @@ module VGADriverIO_2_tb;
         */
         /*
         BUS_WE = 1;
-        BUS_ADDR = 8'hB3;
-        inout_drive = 8'b00000001;
+        BUS_ADDR = 8'hB1;
+        inout_drive = 8'b10000000;
         #3
         BUS_WE = 0;
         */
@@ -96,8 +103,8 @@ module VGADriverIO_2_tb;
         */
         /*
         BUS_WE = 1;
-        BUS_ADDR = 8'hB3;
-        inout_drive = 8'b00000001;
+        BUS_ADDR = 8'hB1;
+        inout_drive = 8'b10000000;
         #3
         BUS_WE = 0;
         //inout_drive = 8'b00000000;
@@ -123,6 +130,8 @@ module VGADriverIO_2_tb;
 
         Status: PASSED
         */
+
+        
         //Process to write 1 on asdress 0
         //Get X
         BUS_WE = 1;
@@ -147,8 +156,8 @@ module VGADriverIO_2_tb;
         //Write on the Adress
         #3
         BUS_WE = 1;
-        BUS_ADDR = 8'hB3;
-        inout_drive = 8'b00000001;
+        BUS_ADDR = 8'hB1;
+        inout_drive = 8'b10000000;
         #3
         BUS_WE = 0;
         #3
@@ -170,14 +179,14 @@ module VGADriverIO_2_tb;
         #3
         BUS_WE = 1;
         BUS_ADDR = 8'hB2;
-        inout_drive = 8'b00000000;
+        inout_drive = 8'b00000001;
         #3
         BUS_WE = 0;
         //Write on the Adress
         #3
         BUS_WE = 1;
-        BUS_ADDR = 8'hB3;
-        inout_drive = 8'b00000001;
+        BUS_ADDR = 8'hB1;
+        inout_drive = 8'b10001011;
         #3
         BUS_WE = 0;
         
