@@ -102,35 +102,31 @@ module Processor (
   DO_MATHS_OPP_SAVE_IN_B = 8'h31,  //The result of maths op. is available, save it to Reg B.
   DO_MATHS_OPP_0 = 8'h32,  //wait for new op address to settle. end op.
   //In/Equality
-  BRANCH_IF_A_EQUAL_B = 8'h33,  //
-  BRANCH_IF_0 = 8'h36,  //
-  BRANCH_IF_1 = 8'h37,  //wait for new op address to settle. end op.
+  BRANCH_IF_A_EQUAL_B = 8'h33,  // Evaluate ALU output to determine wether to branch
+  BRANCH_IF_0 = 8'h36,  // Branch if condition passed
+  BRANCH_IF_1 = 8'h37,  // wait for new op address to settle. end op.
   //GoTo
-  GOTO_ADDR = 8'h38,  //
-  GOTO_ADDR_0 = 8'h39,  //
-  GOTO_ADDR_1 = 8'h40,  //
-  GOTO_IDLE = 8'h42,  //
-  GOTO_IDLE_0 = 8'h43,  //
+  GOTO_ADDR = 8'h38,  // Wait for ROM to settle
+  GOTO_ADDR_0 = 8'h39,  // Read address to load into PC
+  GOTO_ADDR_1 = 8'h40,  // Wait for new op address to settle again
   //Function Start
-  FUNC_CALL_ADDR = 8'h44,  //
-  FUNC_CALL_ADDR_0 = 8'h45,  //
-  FUNC_CALL_ADDR_1 = 8'h46,  //
+  FUNC_CALL_ADDR = 8'h44,  // Wait for new op address to settle, save context
+  FUNC_CALL_ADDR_0 = 8'h45,  // Update PC with address
+  FUNC_CALL_ADDR_1 = 8'h46,  // Wait for new op address to settle again
   //Return from Func
-  RETURN_FROM_FUNC = 8'h47,  //
-  RETURN_FROM_FUNC_0 = 8'h48,  //
+  RETURN_FROM_FUNC = 8'h47,  // Load context into PC
+  RETURN_FROM_FUNC_0 = 8'h48,  // Wait for new op address to settle
   //Dereference
-  READ_ADDR_IN_A_SET_TO_A = 8'h49,  //
-  READ_ADDR_IN_B_SET_TO_B = 8'h50,  // 
-  READ_ADDR_IN_A_SET_TO_0 = 8'h51,  // 
-  READ_ADDR_IN_A_SET_TO_1 = 8'h52,  //
+  READ_ADDR_IN_A_SET_TO_A = 8'h49,  // Dereference A
+  READ_ADDR_IN_B_SET_TO_B = 8'h50,  // Dereference B
+  READ_ADDR_IN_A_SET_TO_0 = 8'h51,  // Increment counter, wait for bus to settle
+  READ_ADDR_IN_A_SET_TO_1 = 8'h52,  // Store value in register, wait for new op address to settle
   //Immediate math
-  DO_MATHS_IMM_SAVE_IN_A = 8'h53,  //The result of maths op. is available, save it to Reg A.
-  DO_MATHS_IMM_SAVE_IN_B = 8'h54,  //The result of maths op. is available, save it to Reg B.
-  DO_MATHS_IMM_0 = 8'h55,  //wait for new op address to settle. end op.
-  DO_MATHS_IMM_1 = 8'h56,  //wait for new op address to settle. end op.
-  DO_MATHS_IMM_2 = 8'h57;
-  //Immediate load?
-
+  DO_MATHS_IMM_SAVE_IN_A = 8'h53,  // Load operation (save to A)
+  DO_MATHS_IMM_SAVE_IN_B = 8'h54,  // Load operation (save to B)
+  DO_MATHS_IMM_0 = 8'h55,  // Read immediate
+  DO_MATHS_IMM_1 = 8'h56,  // Set PC to +2
+  DO_MATHS_IMM_2 = 8'h57;  // wait for new op address to settle, update register
 
   //Sequential part of the State Machine.
   reg [7:0] CurrState, NextState;
@@ -334,7 +330,7 @@ module Processor (
       //Wait state for new prog address to settle.
       DO_MATHS_IMM_0: begin
         NextState = DO_MATHS_IMM_1;
-        NextImm = ProgMemoryOut;
+        NextImm   = ProgMemoryOut;
       end
       //Wait state - to give time for the mem data to be read
       //Increment the program counter here. This must be done 2 clock cycles ahead
@@ -342,7 +338,7 @@ module Processor (
       DO_MATHS_IMM_1: begin
         NextState = DO_MATHS_IMM_2;
         NextProgCounter = CurrProgCounter + 2;
-      end  
+      end
       //The data will now have arrived from memory. Write it to the proper register.
       DO_MATHS_IMM_2: begin
         NextState = CHOOSE_OPP;
@@ -399,22 +395,6 @@ module Processor (
       GOTO_ADDR_1: begin
         NextState = CHOOSE_OPP;
       end
-
-      ///////////////////////////////////////////////////////////////////////////////////////
-      //GOTO IDLE: RESET to IDLE state:
-      // - Increment Program counter? Or should it be reset?. 
-      // - Wait for ROM to settle, and go to IDLE state.
-
-      // Wait for ROM to settle
-      GOTO_IDLE: begin
-        // NextProgCounter = NextProgCounter + 1;  //? Should the counter be reset here?
-        NextState = IDLE;
-      end
-
-      // Wait for ROM to settle again.
-      // GOTO_IDLE_0: begin
-      //   NextState = IDLE;
-      // end
 
       ///////////////////////////////////////////////////////////////////////////////////////
       //FUNC CALL ADDR: JUMP and LINK pipeline:
