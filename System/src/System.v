@@ -117,7 +117,7 @@ module System (
   );
 
   //////////////////////////////////////////////////////////////////////////////////
-  VGADriverIO_2 to_mouni (
+  VGADriverIO_2 vga (
     .CLK(CLK),
     .RESET(RESET),
     .BUS_ADDR(bus_addr),
