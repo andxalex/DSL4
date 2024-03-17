@@ -10,8 +10,8 @@ module LEDIO (
     //OUT
     output [15:0] LED_OUT
 
-);
-
+); 
+ 
 
   // Register bank, holds device state
   reg [7:0] regBank[1:0];
@@ -20,7 +20,7 @@ module LEDIO (
   wire [7:0] BufferedBusData;
   reg [7:0] DataBusOut;
   reg DataBusOutWE;
-
+ 
 
 
   // The register bank is effectively an extension of Data memory. The Base address below 
