@@ -1,5 +1,25 @@
 `timescale 1ns / 1ps
+
 //////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: Andreas Alexandrou
+// 
+// Create Date: 17.03.2024 16:56:16
+// Design Name: 
+// Module Name: SegSevDriverIO_TB.v
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
 module SegSevDriverIO_TB;
 
   // Inputs
@@ -63,8 +83,9 @@ module SegSevDriverIO_TB;
     busaddr = 8'h00;
     BUS_WE  = 0;
     // Validate output one cycle after writing
-    if (REG_BANK[0] != 8'h0F) $display("Error in right register bank, %m: REG_BANK[0] != 8'h0F");
-    else $display("Write to right register bank executed correctly");
+    if (REG_BANK[0] == 8'h0F) $display("Write to right register bank executed correctly");
+    else $display("Error in right register bank, %m: REG_BANK[0] != 8'h0F");
+    $display("  - Writing digits 1 and 0, expected: 0x%0h got: 0x%0h", 8'h0F, REG_BANK[0]);
     #1000
 
     // Write value to left register bank and validate
@@ -76,8 +97,9 @@ module SegSevDriverIO_TB;
     busaddr = 8'h00;
     BUS_WE  = 0;
     // Validate output one cycle after writing
-    if (REG_BANK[1] != 8'hF0) $display("Error in left register bank, %m: REG_BANK[1] != 8'hF0");
-    else $display("Write to left register bank executed correctly");
+    if (REG_BANK[1] == 8'hF0) $display("Write to left register bank executed correctly");
+    else $display("Error in right register bank, %m: REG_BANK[1] != 8'hF0");
+    $display("  - Writing digits 3 and 2, expected: 0x%0h got: 0x%0h", 8'hF0, REG_BANK[1]);
     #1000
 
     // Write value to DOTS and validate
@@ -89,17 +111,18 @@ module SegSevDriverIO_TB;
     busaddr = 8'h00;
     BUS_WE  = 0;
     // Validate output one cycle after writing
-    if (REG_BANK[2] != 8'h0F) $display("Error in DOT register bank, %m: REG_BANK[2] != 8'h0F");
-    else $display("Write to DOT register bank executed correctly");
+    if (REG_BANK[2] == 8'h0F) $display("Write to DOT register bank executed correctly");
+    else $display("Error in DOT register bank, %m: REG_BANK[2] != 8'h0F");
+    $display("  - Writing DOTS, expected: 0x%0h got: 0x%0h", 8'h0F, REG_BANK[2]);
     #1000
 
     // VALIDATE READ
     // Read value from right register bank and validate
     busaddr = 8'hD0;
     #10  // Wait a single and verify
-    if ((BUS_DATA != 8'h0F) & BUS_DATA != 8'hzz)
-      $display("Error in reading right register bank, %m: BUS_DATA != 8'h0F");
-    else $display("Read from right register bank executed correctly");
+    if (BUS_DATA == 8'h0F) $display("Read from right register bank executed correctly");
+    else $display("Error in reading right register bank, %m: BUS_DATA != 8'h0F");
+    $display("  - Reading digits 1 and 0, expected: 0x%0h got: 0x%0h", 8'h0F, BUS_DATA);
     // Lower after verifying
     busaddr = 8'h00;
     #1000;
@@ -107,9 +130,9 @@ module SegSevDriverIO_TB;
     // Read value from left register bank and validate
     busaddr = 8'hD1;
     #10  // Wait a single and verify
-    if ((BUS_DATA != 8'hF0) & BUS_DATA != 8'hzz)
-      $display("Error in reading left register bank, %m: BUS_DATA != 8'hF0");
-    else $display("Read from left register bank executed correctly");
+    if (BUS_DATA == 8'hF0) $display("Read from left register bank executed correctly");
+    else $display("Error in reading left register bank, %m: BUS_DATA != 8'hF0");
+    $display("  - Reading digits 3 and 2, expected: 0x%0h got: 0x%0h", 8'hF0, BUS_DATA);
     // Lower after verifying
     busaddr = 8'h00;
     #1000;
@@ -117,9 +140,9 @@ module SegSevDriverIO_TB;
     // Read value from DOT register bank and validate
     busaddr = 8'hD2;
     #10  // Wait a single and verify
-    if ((BUS_DATA != 8'h0F) & BUS_DATA != 8'hzz)
-      $display("Error in reading left register bank, %m: BUS_DATA != 8'h0F");
-    else $display("Read from left register bank executed correctly");
+    if (BUS_DATA == 8'h0F) $display("Read from left register bank executed correctly");
+    else $display("Error in reading left register bank, %m: BUS_DATA != 8'h0F");
+    $display("  - Reading DOTS, expected: 0x%0h got: 0x%0h", 8'h0F, BUS_DATA);
     // Lower after verifying
     busaddr = 8'h00;
     #1000;
