@@ -73,7 +73,8 @@ module VGADriverIO_2 (
      Frame_Buffer frame_buffer (
        .A_CLK(CLK),
        .A_ADDR({regBank[1][6:0],regBank[0]}),  
-       .A_DATA_IN(regBank[2][0]),            
+       .A_DATA_IN(regBank[2][0]),  
+       //.A_WE(1'b1),                
        .A_WE(regBank[1][7]),                  
        .B_CLK(drp_clk),
        .B_ADDR(vga_addr),
@@ -101,7 +102,7 @@ module VGADriverIO_2 (
       regBank[1]   <= 8'h0;
       regBank[2]   <= 8'h0;
     end else begin
-      if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < (BaseAddr + 4))) begin
+      if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < (BaseAddr + 3))) begin
         if (BUS_WE) begin
           DataBusOutWE <= 1'b0;
           regBank[BUS_ADDR-BaseAddr] <= BufferedBusData;
@@ -117,11 +118,11 @@ module VGADriverIO_2 (
 //Required registers and wires that change the colour every one second.
 
   wire                  sec_wire;
-  reg      [15:0]       colour = 16'h000;
+ reg      [15:0]       colour = 16'h000;
 
 //////////////////////////////////////////////////////////////////////////////////
 
-//  //1 Second Counter 100000000
+ //1 Second Counter 100000000
 //  Generic_counter  # (.COUNTER_WIDTH(27),
 //                 .COUNTER_MAX(100000000)
 //                 )
@@ -146,7 +147,7 @@ module VGADriverIO_2 (
       if(RESET)
           colour <= CONFIG_COLOURS;
       else
-          if(regBank[2][1] & ~b)
+          if((regBank[2][1] & ~b))
               colour <=  colour +10;
           else
             colour <=  colour; 
