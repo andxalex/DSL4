@@ -73,8 +73,7 @@ module VGADriverIO_2 (
      Frame_Buffer frame_buffer (
        .A_CLK(CLK),
        .A_ADDR({regBank[1][6:0],regBank[0]}),  
-       .A_DATA_IN(regBank[2][0]),  
-       //.A_WE(1'b1),                
+       .A_DATA_IN(regBank[2][0]),               
        .A_WE(regBank[1][7]),                  
        .B_CLK(drp_clk),
        .B_ADDR(vga_addr),
@@ -118,21 +117,7 @@ module VGADriverIO_2 (
 //Required registers and wires that change the colour every one second.
 
   wire                  sec_wire;
- reg      [15:0]       colour = 16'h000;
-
-//////////////////////////////////////////////////////////////////////////////////
-
- //1 Second Counter 100000000
-//  Generic_counter  # (.COUNTER_WIDTH(27),
-//                 .COUNTER_MAX(100000000)
-//                 )
-//                 General_Counter(
-//                 .CLK(CLK),
-//                 .RESET(1'b0),
-//                 .ENABLE(1'b1),
-//                 .TRIG_OUT(sec_wire)
-//                 );
-    
+  reg      [15:0]       colour = 16'h000;
 //////////////////////////////////////////////////////////////////////////////////
 
 //Logic to change the output colour every one second. It is put here so that it
