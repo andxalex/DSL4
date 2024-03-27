@@ -117,26 +117,26 @@ module VGADriverIO_2 (
 //Required registers and wires that change the colour every one second.
 
   wire                  sec_wire;
-  reg      [15:0]       colour = 16'h000;
+  reg      [15:0]       colour = 16'b1111111100000000;
 //////////////////////////////////////////////////////////////////////////////////
 
 //Logic to change the output colour every one second. It is put here so that it
 //chnages on the high edge since it is a register.
-  reg b;
-  always@(posedge CLK) begin
-    b <= regBank[2][1];
-  end
+  // reg b;
+  // always@(posedge CLK) begin
+  //   b <= regBank[2][1];
+  // end
 
-  always@(posedge CLK) begin
+  // always@(posedge CLK) begin
 
-      if(RESET)
-          colour <= CONFIG_COLOURS;
-      else
-          if((regBank[2][1] & ~b))
-              colour <=  colour +10;
-          else
-            colour <=  colour; 
-  end
+  //     if(RESET)
+  //         colour <= CONFIG_COLOURS;
+  //     else
+  //         if((regBank[2][1] & ~b))
+  //             colour <=  colour +10;
+  //         else
+  //           colour <=  colour; 
+  // end
  //////////////////////////////////////////////////////////////////////////////////
  assign CONFIG_COLOURS = colour; 
 //////////////////////////////////////////////////////////////////////////////////

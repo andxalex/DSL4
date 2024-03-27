@@ -1,0 +1,68 @@
+###################Initialise registers and Start LOOP#########################
+lda 0x00        #START_2, Initialise reg A with zero
+ldb 0x00        #Initialise reg B with zero    
+sta 0x02        #Store adress of A
+stb 0x03        #Store adress of B
+sta 0xB0        #A for X (Write first 00)
+stb 0xB1        #B for Y
+ldb 0x03        #LOOP (0x0C)
+sta 0x02        #Store adress of A
+stb 0x03        #Store adress of B
+sta 0xB0        #A for X
+stb 0xB1        #B for Y
+###################Check addresses to see whther to colour patter##############
+ldb 0x09            #Check X
+beq 0x30            #COLOR
+ldb 0x0A
+beq 0x30            #COLOR
+ldb 0x03
+lda 0x0B            #Check Y
+beq 0x30            #COLOR
+lda 0x0C
+beq 0x30            #COLOR
+ldb 0x01       
+stb 0xB2
+lda 0x01
+beq 0x34        #Case where address is not a line (SKIP)
+ldb 0x00        #Where COLOR should go (LINE_COLOR)
+stb 0xB2
+###################Check for Address of Mouse##################################
+lda 0x02        #Load old adresses (SKIP should go here)
+ldb 0xA1        # Check X
+stb 0xD1        # Write to Seg2/3
+beq 0x42
+lda 0x01
+ldb 0x01
+beq 0x57
+ldb 0x03        #Check Y
+lda 0x0D
+alu sub
+ldb 0xA2
+stb 0xD0        # Write to Seg0/1
+beq 0x53        #COLOUR
+lda 0x01
+ldb 0x01
+beq 0x57        #SKIP
+ldb 0x00        #COLOUR
+stb 0xB2
+###################Continue LOOP###############################################
+lda 0x02        #Load old adresses(SKIP)
+ldb 0x03
+alu app         #Increase value of A
+sta 0x02        #Turn on and off Write enable, Bit operations
+blui orr 0x80
+stb 0xB1
+blui and 0x7F
+stb 0xB1
+ldb 0x02        #Load old addresses
+lda 0x02
+ldb 0x00 
+bgt 0x0C        #Check if a has overflowed so that it means we move to the next row (LOOP)
+ldb 0x03        #Get old adress of B
+blu bpp         #Increase B
+stb 0x03        #Store b
+lda 0x08        #Load a with 127
+beq 0x7B        #Compare B with 127 to see if program is finsiihed (Go to END)
+lda 0x00
+gto 0x0C        #Else continue the loop (Go to LOOP)
+gti             #END (3C)
