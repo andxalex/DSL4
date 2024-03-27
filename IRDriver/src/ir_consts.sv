@@ -6,7 +6,7 @@
 `ifndef IR_CONSTS_SV
 `define IR_CONSTS_SV
 
-`include "../consts.sv"
+`include "consts.sv"
 
 // The set of states that the IR transmitter can be in
 typedef enum {

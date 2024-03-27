@@ -1,5 +1,5 @@
 `include "ir_consts.sv"
-`include "../frequency_generator.sv"
+`include "frequency_generator.sv"
 `include "ir_transmitter_sm.sv"
 
 // The top level module for the IR transmitter. This module contains the state

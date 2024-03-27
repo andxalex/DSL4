@@ -1,4 +1,4 @@
-`include "../../design/consts.sv"
+`include "consts.sv"
 
 // Testbench for CarSelect module
 module CarSelect_TB;

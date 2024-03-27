@@ -31,13 +31,17 @@ module System (
     // MOUSE
     inout         CLK_MOUSE,
     inout         DATA_MOUSE,
-    // OUT
+    // LED
     output [15:0] LED_OUT,
+    // 7SEG
     output [ 3:0] SEG_SELECT,
     output [ 7:0] DEC_OUT,
+    // VGA
     output        VGA_HS,
     output        VGA_VS,
-    output [ 7:0] VGA_COLOUR
+    output [ 7:0] VGA_COLOUR,
+    // IR Signals
+    output IR_LED
 );
 
   //////////////////////////////////////////////////////////////////////////////////
@@ -152,4 +156,19 @@ module System (
   );
 
   //////////////////////////////////////////////////////////////////////////////////
+  
+  IRTransmitterBusInterface ir_transmitter_bus_interface(
+      // Standard signals
+      .CLK(CLK),
+      .RESET(RESET),
+
+      // Bus signals
+      .BUS_DATA(bus_data),
+      .BUS_ADDR(bus_addr),
+      .BUS_WE(bus_we),
+
+      // IRTransmitter signals
+      .IR_LED(IR_LED),
+      .CAR_SWITCHES(SLIDE_S[1:0])
+  );
 endmodule
