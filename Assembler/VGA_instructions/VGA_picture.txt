@@ -1,0 +1,170 @@
+lda 0x00        #START_2, Initialise reg A with zero
+ldb 0x00        #Initialise reg B with zero    
+sta 0x02        #Store adress of A
+stb 0x03        #Store adress of B
+sta 0xB0        #A for X (Write first 00)
+stb 0xB1        #B for Y
+ldb 0x03        #LOOP (0C)
+sta 0x02        #Store adress of A
+stb 0x03        #Store adress of B
+sta 0xB0        #A for X
+stb 0xB1        #B for Y
+
+blui and 0x3F 
+blui srb 0x03
+
+
+#Ckeck what section it is
+lda 0x00 #if result is 0
+blt 0x22
+stb 0x0B
+gto 0x82
+
+#Ckeck what section it is
+lda 0x01 #if result is 1 LOOP
+blt 0x2E
+ldb 0x00
+blui add 0x02
+stb 0x0B
+gto 0x82
+
+#Ckeck what section it is
+lda 0x04 #if result is 2
+blt 0x3A
+ldb 0x00
+blui add 0x04
+stb 0x0B
+gto 0x82
+
+#Ckeck what section it is
+lda 0x05 #if result is 3
+blt 0x46
+ldb 0x00
+blui add 0x06
+stb 0x0B
+gto 0x82
+
+#Ckeck what section it is
+lda 0x06 #if result is 4
+blt 0x52
+ldb 0x00
+blui add 0x08
+stb 0x0B
+gto 0x82
+
+#Ckeck what section it is
+lda 0x07 #if result is 5
+blt 0x5E
+ldb 0x00
+blui add 0x0A
+stb 0x0B
+gto 0x82
+
+#Ckeck what section it is
+lda 0x08 #if result is 6
+blt 0x6A
+ldb 0x00
+blui add 0x0C
+stb 0x0B
+gto 0x82
+
+
+#Ckeck what section it is
+lda 0x09 #if result is 7
+blt 0x76
+ldb 0x00
+blui add 0x0E
+stb 0x0B
+gto 0x82
+
+#Ckeck what section it is
+lda 0x0A #if result is 8
+blt 0x82
+ldb 0x00
+blui add 0x10
+stb 0x0B
+gto 0x82
+
+#load a and b
+lda 0x02 #(128)
+ldb 0x0B
+#Get a
+alui sra 0x07
+alui add 0x0C
+alu add 
+dfa         #a becomes colour
+
+sta 0x1D
+lda 0x02
+
+alui and 0x7F #will take into account next bits
+alui sra 0x04 #Check which bit to take
+
+#check which bit I need
+ldb 0x00 #if result is 0
+bgt 0x9C
+lda 0x1D
+gto 0xE2
+
+ldb 0x01 #if result is 1
+bgt 0xA6
+lda 0x1D
+alui sra 0x01
+gto 0xE2
+
+ldb 0x04 #if result is 2
+bgt 0xB0
+lda 0x1D
+alui sra 0x02
+gto 0xE2
+
+ldb 0x05 #if result is 3
+bgt 0xBA
+lda 0x1D
+alui sra 0x03
+gto 0xE2
+
+ldb 0x06 #if result is 4
+bgt 0xC4
+lda 0x1D
+alui sra 0x04
+gto 0xE2
+
+ldb 0x07 #if result is 5
+bgt 0xCE
+lda 0x1D
+alui sra 0x05
+gto 0xE2
+
+ldb 0x08 #if result is 6
+bgt 0xD8
+lda 0x1D
+alui sra 0x06
+gto 0xE2
+
+ldb 0x09 #if result is 7
+bgt 0xE2
+lda 0x1D
+alui sra 0x07
+gto 0xE2
+
+
+
+
+
+
+sta 0xB2        #store_adress
+lda 0x02        #Load old adresses
+ldb 0x03
+alu app         #Increase value of A
+sta 0x02        #Turn on and off Write enable, Bit operations
+ldb 0x00 
+bgt 0x0C        #Check if a has overflowed so that it means we move to the next row
+ldb 0x03        #Get old adress of B
+blu bpp         #Increase B
+stb 0x03        #Store b
+lda 0x1C        #Load a with 127
+beq 0xFC        #Compare B with 127 to see if program is finsiihed (Go to END)
+lda 0x00
+gto 0x0C       #Else continue the loop (Go to LOOP)
+gti             #END (3C)
