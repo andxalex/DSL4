@@ -1,4 +1,7 @@
 `timescale 1ns / 1ps
+
+`include "../../IRDriver/src/ir_consts.sv"
+`include "../../IRDriver/consts.sv"
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
 // Engineer:
@@ -41,7 +44,7 @@ module System (
     output        VGA_VS,
     output [ 7:0] VGA_COLOUR,
     // IR Signals
-    output IR_LED
+    output        IR_LED
 );
 
   //////////////////////////////////////////////////////////////////////////////////
@@ -156,16 +159,16 @@ module System (
   );
 
   //////////////////////////////////////////////////////////////////////////////////
-  
-  IRTransmitterBusInterface ir_transmitter_bus_interface(
+
+  IRTransmitterBusInterface ir_transmitter_bus_interface (
       // Standard signals
-      .CLK(CLK),
+      .CLK  (CLK),
       .RESET(RESET),
 
       // Bus signals
       .BUS_DATA(bus_data),
       .BUS_ADDR(bus_addr),
-      .BUS_WE(bus_we),
+      .BUS_WE  (bus_we),
 
       // IRTransmitter signals
       .IR_LED(IR_LED),

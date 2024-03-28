@@ -1,4 +1,4 @@
-`include "consts.sv"
+`include "../consts.sv"
 
 /**Provides an abstraction over the IR Transmitter module to allow for
  * addressing on a bus.

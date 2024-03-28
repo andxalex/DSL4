@@ -1,5 +1,5 @@
 `include "car_select.sv"
-`include "frequency_generator.sv"
+`include "../frequency_generator.sv"
 `include "ir_consts.sv"
 
 // Progresses through a state machine which represents the different stages of
