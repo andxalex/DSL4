@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
-// Engineer: 
+// Engineer: Alexandros Zoupos
 // 
 // Create Date: 26.01.2024 14:00:35
 // Design Name: 
