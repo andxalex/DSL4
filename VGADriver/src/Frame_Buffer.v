@@ -38,7 +38,7 @@ module Frame_Buffer (
 
 
   //Outputs
-  output reg        A_DATA_OUT,
+  output wire        A_DATA_OUT,
   output reg        B_DATA
 );
 //////////////////////////////////////////////////////////////////////////////////
@@ -49,7 +49,7 @@ module Frame_Buffer (
 reg [0:0] Mem[2**15-1:0];
 //////////////////////////////////////////////////////////////////////////////////
 
-
+assign A_DATA_OUT = Mem[A_ADDR];
 // Port A - Read/Write e.g. to be used by microprocessor
 always @(posedge A_CLK) begin
 
@@ -57,7 +57,7 @@ always @(posedge A_CLK) begin
       
           Mem[A_ADDR] <= A_DATA_IN;
           
-      A_DATA_OUT <= Mem[A_ADDR];
+      
 
 end
 //////////////////////////////////////////////////////////////////////////////////

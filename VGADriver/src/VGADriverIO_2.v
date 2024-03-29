@@ -38,7 +38,7 @@ module VGADriverIO_2 (
     input  [7:0]        BUS_ADDR,
     input               BUS_WE,
     //Outputs to VGA
-    output              A_DATA_OUT,
+    //output              A_DATA_OUT,
     output              VGA_HS,
     output              VGA_VS,
     output [7:0]        VGA_COLOUR
@@ -67,6 +67,7 @@ module VGADriverIO_2 (
   wire     [14:0]       vga_addr;
   wire                  b_data;
   wire     [15:0]       CONFIG_COLOURS;
+  wire                  a_data_out;
 
 //////////////////////////////////////////////////////////////////////////////////
    // Instantiate Frame_Buffer and VGA_Sig_Gen modules
@@ -77,7 +78,7 @@ module VGADriverIO_2 (
        .A_WE(regBank[1][7]),                  
        .B_CLK(drp_clk),
        .B_ADDR(vga_addr),
-       .A_DATA_OUT(A_DATA_OUT),
+       .A_DATA_OUT(a_data_out),
        .B_DATA(b_data)
      );
 //////////////////////////////////////////////////////////////////////////////////
@@ -101,6 +102,7 @@ module VGADriverIO_2 (
       regBank[1]   <= 8'h0;
       regBank[2]   <= 8'h0;
     end else begin
+      regBank[2][1] <= a_data_out;
       if ((BUS_ADDR >= BaseAddr) & (BUS_ADDR < (BaseAddr + 3))) begin
         if (BUS_WE) begin
           DataBusOutWE <= 1'b0;
@@ -140,7 +142,6 @@ module VGADriverIO_2 (
  //////////////////////////////////////////////////////////////////////////////////
  assign CONFIG_COLOURS = colour; 
 //////////////////////////////////////////////////////////////////////////////////
-
 endmodule
 
 
