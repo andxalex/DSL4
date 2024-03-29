@@ -82,25 +82,25 @@ lda 0xA1        # A = X
 ldb 0x09        # B = 53           
 bgt 0x8B        # if A > 53 skip to next check  
 lda 0x0F        # A = F = 0                          
-alui add 0x01   # A = 1            
+alui add 0x02   # A = 1            
 sta 0x0F        # F = 1
 gto 0x95        # skip to y
 ldb 0x0A        # B = 107
 blt 0x95        # if A < 107 skip to y   
 lda 0x0F        # A = F = 0
-alui add 0x02   # A = 2
+alui add 0x01   # A = 2
 sta 0x0F        # F = 2
 lda 0xA2        # A = Y
 ldb 0x0B        # B = 40  
 bgt 0XA3        # 
 lda 0x0F       
-alui orr 0x08   
+alui orr 0x04   
 sta 0x0F        
 gto 0xAD # gto S    
 ldb 0x0C # -> c    
 blt 0xAD         
 lda 0x0F          
-alui orr 0x04
+alui orr 0x08
 sta 0x0F 
 lda 0x0F # S      
 sta 0x90
