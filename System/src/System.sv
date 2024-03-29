@@ -159,19 +159,19 @@ module System (
 
   //////////////////////////////////////////////////////////////////////////////////
 
-//   IRTransmitterBusInterface ir_transmitter_bus_interface (
-//       // Standard signals
-//       .CLK  (CLK),
-//       .RESET(RESET),
+   IRTransmitterBusInterface ir_transmitter_bus_interface (
+       // Standard signals
+       .CLK  (CLK),
+       .RESET(RESET),
 
-//       // Bus signals
-//       .BUS_DATA(bus_data),
-//       .BUS_ADDR(bus_addr),
-//       .BUS_WE  (bus_we),
+       // Bus signals
+       .BUS_DATA(bus_data),
+       .BUS_ADDR(bus_addr),
+       .BUS_WE  (bus_we),
 
-//       // IRTransmitter signals
-//       .IR_LED(IR_LED),
-//       .CAR_SWITCHES(SLIDE_S[1:0])
-//   );
+       // IRTransmitter signals
+       .IR_LED(IR_LED),
+       .CAR_SWITCHES(SLIDE_S[1:0])
+   );
 //////////////////////////////////////////////////////////////////////////////////
 endmodule
